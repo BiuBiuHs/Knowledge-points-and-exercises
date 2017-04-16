@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style>
+#img1{filter:alpha(opacity:30); opacity:0.3;}
+</style>
+<title>无标题文档</title>
+<script>
+window.onload=function()
+{
+	var oImg=document.getElementById('img1');
+	oImg.onmouseover=function()
+	{
+		startMove(100);
+	}
+	oImg.onmouseout=function()
+	{
+		startMove(30);
+	}
+}
+var alpha=30;
+var time=null;
+function startMove(iTarget)
+{
+	var oImg=document.getElementById('img1');
+	clearInterval(time)
+	
+	time=setInterval(function (){
+	
+	var iSpeed=0;
+	
+	if(alpha<iTarget)
+	{iSpeed=10;}
+	else
+	{iSpeed=-10;}
+	if(alpha==iTarget)
+	{
+	clearInterval(time)
+	}
+	else
+	{
+		alpha+=iSpeed;	
+		oImg.style.filter='alpha(opacity:'+alpha+')';
+		oImg.style.opacity=alpha/100;
+	}
+	
+	},30);
+}
+</script>
+</head>
+
+<body>
+<img src="2.jpg" id="img1"/>
+</body>
+</html>
