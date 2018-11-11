@@ -101,5 +101,24 @@ expect(wrapper.emitted().foo.length).toBe(2)
 expect(wrapper.emitted().foo[1]).toEqual([123])
 ```
 
+也可以调用 wrapper.emittedByOrder() 获取一个按触发先后排序的事件数组
 
+#### 操作组件状态
+
+```
+wrapper.setData({ count: 10 })
+
+wrapper.setProps({ foo: 'bar' })
+```
+#### 仿造 Prop
+
+```
+import { mount } from '@vue/test-utils'
+
+mount(Component, {
+  propsData: {
+    aProp: 'some value'
+  }
+})
+```
 
