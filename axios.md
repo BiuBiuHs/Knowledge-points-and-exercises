@@ -53,7 +53,8 @@ service.interceptors.request.use(
     }
     cancelPending(config) //调用上面的定义好的函数  取消重复的请求
     config.cancelToken = new CancelToken(res => {
-      pending.push({'UrlPath': config.url, 'Cancel': res})// 这个参数res 就是CancelToken构造函数里面 自带的取消请求的函数，调用该函数 即可取消请求
+    // 这个参数res 就是CancelToken构造函数里面 自带的取消请求的函数，调用该函数 即可取消请求
+      pending.push({'UrlPath': config.url, 'Cancel': res})
     })
     return config
   },
