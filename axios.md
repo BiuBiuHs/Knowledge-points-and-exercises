@@ -19,13 +19,62 @@ this.$axios.all([请求1,请求2])
 
 ### 取消请求
 
-const CancelToken = axios.CalcelToken;
-const source = CancelToken.source();//创建标识 请求的源对象
+```
+import axios from 'axios'
+import Cookies from 'js-cookie'
+ 
+let pending = [] //axios 请求数组
+let CancelToken = axios.CancelToken //创建取消请求
+ 
+let cancelPending = (config) => {
+  pending.forEach((item, index) => {
+    if (config) {
+      if (item.UrlPath === config.url) { //通过判断url ，来辨别是否是同一请求 ，相同请求则 取消
+        item.Cancel() // 取消请求
+        pending.splice(index, 1) // 移除当前请求记录
+      };
+    } else {
+      item.Cancel() // 取消请求
+      pending.splice(index, 1) // 移除当前请求记录
+    }
+  })
+}
+ 
+// 创建axios实例
+const service = axios.create({
+  baseURL: process.env.BASE_API, // api的base_url
+  timeout: 600000 // 请求超时时间
+})
+ 
+service.interceptors.request.use(
+  config => {
+    if (Cookies.get('Admin-Token')) { 
+      config.headers['Authorization'] = Cookies.get('Admin-Token')//放入token
+    }
+    cancelPending(config) //调用上面的定义好的函数  取消重复的请求
+    config.cancelToken = new CancelToken(res => {
+      pending.push({'UrlPath': config.url, 'Cancel': res})// 这个参数res 就是CancelToken构造函数里面 自带的取消请求的函数，调用该函数 即可取消请求
+    })
+    return config
+  },
+  (error, response) => {
+    console.log(error)
+    console.log(response)
+  }
+)
+ 
+service.interceptors.response.use(
+  response => {
+    cancelPending(response.config)
+    return response.data
+  }, error => {
+    console.log(error)
+    return Promise.reject(error)
+  }
+)
+export default service
 
-      this.source=source;//将对象存储到组件
-      
-      cancelToken:source.token, //设置请求的options属性
-      this.source.cancel();//取消之前的那个请求
+```
 
 ### 请求拦截器
 ```
@@ -65,3 +114,4 @@ serivce.interceptors.response.use( //响应拦截，主要针对部分回掉数�
 )
 
 ```
+
