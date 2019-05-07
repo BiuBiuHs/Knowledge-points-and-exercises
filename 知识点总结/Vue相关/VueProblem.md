@@ -23,3 +23,19 @@ setTimeout(function(){
 },3000);
  clearTimeout(33);
  ```
+  ##### 在Vue当中引入图片问题 当对img中的src属性使用绑定时  需要使用require来引入图片
+      ```
+      //配图 .js
+
+      {
+        subjectImg: require('../../assets/oppo-combination-buy/purchase_class_01.jpg'),
+        subjectId: 'math',
+        subjectPriceImg: require('../../assets/oppo-combination-buy/purchase_class_-100.png'),
+        priceZimg: require('../../assets/oppo-combination-buy/purchase_Price_298.png'),
+      }
+
+      //app.vue
+        import product form './商品.js'
+
+        <img :src="product.subjectImg"> 
+      ```
