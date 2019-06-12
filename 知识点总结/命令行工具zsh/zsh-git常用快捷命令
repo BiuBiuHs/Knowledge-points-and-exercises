@@ -1,0 +1,25 @@
+g - git
+gst - git status
+gl - git pull
+gup - git pull --rebasegp - git push
+gd - git diff
+gdc - git diff --cachedgdv - git diff -w "$@" | view
+gc - git commit -v
+gc! - git commit -v --amendgca - git commit -v -a
+gca! - git commit -v -a --amendgcmsg - git commit -m
+gco - git checkout
+gcm - git checkout mastergr - git remote
+grv - git remote -v
+grmv - git remote renamegrrm - git remote remove
+gsetr - git remote set-urlgrup - git remote updategrbi - git rebase -i
+grbc - git rebase --continuegrba - git rebase --abortgb - git branch
+gba - git branch -a
+gcount - git shortlog -sn
+gcl - git config --listgcp - git cherry-pick
+glg - git log --stat --max-count=10glgg - git log --graph --max-count=10glgga - git log --graph --decorate --allglo - git log --oneline --decorate --colorglog - git log --oneline --decorate --color --graphgss - git status -s
+ga - git addgm - git mergegrh - git reset HEADgrhh - git reset HEAD --hardgclean - git reset --hard && git clean -dfxgwc - git whatchanged -p --abbrev-commit --pretty=mediumgsts - git stash show --textgsta - git stash
+gstp - git stash pop
+gstd - git stash dropggpull - git pull origin $(current_branch)
+ggpur - git pull --rebase origin $(current_branch)ggpush - git push origin $(current_branch)
+ggpnp - git pull origin $(current_branch) && git push origin $(current_branch)
+glp - _git_log_prettily
