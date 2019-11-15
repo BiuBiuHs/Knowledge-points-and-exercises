@@ -5,3 +5,9 @@ webpack 环境变量
 ### 您无法NODE_ENV手动覆盖
 这可以防止开发人员意外地将慢速开发构建部署到生产环境中。
 
+### 使用 webpack.definePlugin 定义一个全局都能访问的变量 将变量挂载在widow上。window.XXX
+
+    new webpack.DefinePlugin({
+        //变量名 window.process.env.DOMAIN_ENV   // value: XXXX
+      'process.env.DOMAIN_ENV':JSON.stringify(process.env.DOMAIN_ENV)
+    }),
