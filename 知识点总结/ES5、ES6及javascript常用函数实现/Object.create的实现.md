@@ -3,7 +3,7 @@
     ```
         function object (p) {
             function F {}
-            F.prototype = 0 
+            F.prototype = p
             return new F()
         }
     ```
