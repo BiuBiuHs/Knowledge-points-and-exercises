@@ -34,34 +34,39 @@
  * @param {string} preorder
  * @return {boolean}
  */
-var isValidSerialization = function(preorder) {
-    let n = preorder.length; //获取字符串长度
-    let i = 0; //从字符串的第一位开始遍历 下标为0
-    let stack = [1] //先在栈中放入根结点 的数量为 1 
-    while (i<n){ //遍历字符串
-        if(!stack.length){ //如果字符串还未遍历完成 栈中却没有元素 代表 没有前驱节点 无法成功组成二叉树
-            return false
-        }
-
-        if(preorder[i]===','){ 
-            ++i
-        }else if(preorder[i]=='#'){ //空元素 消耗一个长度 ，并且不向栈中添加节点 因为没有子节点
-            stack[stack.length-1]--
-            if(stack[stack.length-1]==0){
-                stack.pop()
-            }
-            ++i
-        }else{
-            while(i<n&&preorder[i]!==','){ //但遍历到一个数字时 消耗一个长度 ，此节点有两个子节点 因此向栈中放入2 ，代表有两个子节点
-                ++i
-            }
-            stack[stack.length-1]--
-            if(stack[stack.length-1]==0){ //当最后的元素 为0 时代表 该节点遍历完成，出栈
-                stack.pop()
-            }
-            stack.push(2) //向栈内放入元素 
-            ++i //继续遍历
-        }
+var isValidSerialization = function (preorder) {
+  let n = preorder.length; //获取字符串长度
+  let i = 0; //从字符串的第一位开始遍历 下标为0
+  let stack = [1]; //先在栈中放入根结点 的数量为 1
+  while (i < n) {
+    //遍历字符串
+    if (!stack.length) {
+      //如果字符串还未遍历完成 栈中却没有元素 代表 没有前驱节点 无法成功组成二叉树
+      return false;
     }
-    return stack.length==0 //最后判断栈中是否有元素即可 有元素说明没有组成二叉树，返回false ，无元素 则标示组成了二叉树，返回true
+
+    if (preorder[i] === ",") {
+      ++i;
+    } else if (preorder[i] == "#") {
+      //空元素 消耗一个长度 ，并且不向栈中添加节点 因为没有子节点
+      stack[stack.length - 1]--;
+      if (stack[stack.length - 1] == 0) {
+        stack.pop();
+      }
+      ++i;
+    } else {
+      while (i < n && preorder[i] !== ",") {
+        //但遍历到一个数字时 消耗一个长度 ，此节点有两个子节点 因此向栈中放入2 ，代表有两个子节点
+        ++i;
+      }
+      stack[stack.length - 1]--;
+      if (stack[stack.length - 1] == 0) {
+        //当最后的元素 为0 时代表 该节点遍历完成，出栈
+        stack.pop();
+      }
+      stack.push(2); //向栈内放入元素
+      ++i; //继续遍历
+    }
+  }
+  return stack.length == 0; //最后判断栈中是否有元素即可 有元素说明没有组成二叉树，返回false ，无元素 则标示组成了二叉树，返回true
 };

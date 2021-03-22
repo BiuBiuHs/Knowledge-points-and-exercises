@@ -29,10 +29,10 @@
  * @param {TreeNode} root
  * @return {TreeNode}
  */
-var invertTree = function(root) {
-    if(!root) return null
-    const copyLeft = root.left
-    root.left = invertTree(root.right)
-    root.right = invertTree(copyLeft)
-    return root
+var invertTree = function (root) {
+  if (!root) return null;
+  const copyLeft = root.left;
+  root.left = invertTree(root.right);
+  root.right = invertTree(copyLeft);
+  return root;
 };

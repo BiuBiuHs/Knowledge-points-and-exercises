@@ -4,27 +4,23 @@
 
 // 示例 1:
 
-// 输入: 
-// 	Tree 1                     Tree 2                  
-//           1                         2                             
-//          / \                       / \                            
-//         3   2                     1   3                        
-//        /                           \   \                      
-//       5                             4   7                  
-// 输出: 
+// 输入:
+// 	Tree 1                     Tree 2
+//           1                         2
+//          / \                       / \
+//         3   2                     1   3
+//        /                           \   \
+//       5                             4   7
+// 输出:
 // 合并后的树:
 // 	     3
 // 	    / \
 // 	   4   5
-// 	  / \   \ 
+// 	  / \   \
 // 	 5   4   7
 // 注意: 合并必须从两个树的根节点开始。
 
-
 // 链接：https://leetcode-cn.com/problems/merge-two-binary-trees
-
-
-
 
 /**
  * Definition for a binary tree node.
@@ -38,10 +34,10 @@
  * @param {TreeNode} t2
  * @return {TreeNode}
  */
-var mergeTrees = function(t1, t2) {
-    if(!t1||!t2) return t1||t2
-    t1.left = mergeTrees(t1.left,t2.left)
-    t1.right = mergeTrees(t1.right,t2.right)
-    t1.val =  t1.val + t2.val
-    return t1
+var mergeTrees = function (t1, t2) {
+  if (!t1 || !t2) return t1 || t2;
+  t1.left = mergeTrees(t1.left, t2.left);
+  t1.right = mergeTrees(t1.right, t2.right);
+  t1.val = t1.val + t2.val;
+  return t1;
 };
