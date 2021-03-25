@@ -34,7 +34,22 @@ Function.prototype.myApply = function(obj,args){
 
 
 ```
-// 第四版
+//不考虑 new操作符实现
+Function.prototype.bind2 = function (context) {
+
+    var self = this;
+    // 获取bind2函数从第二个参数到最后一个参数
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    return function () {
+        // 这个时候的arguments是指bind返回的函数传入的参数
+        var bindArgs = Array.prototype.slice.call(arguments);
+        return self.apply(context, args.concat(bindArgs));
+    }
+
+}
+
+// 考虑 bind 后的函数 使用new操作符
 Function.prototype.bind2 = function (context) {
 
     var self = this;
