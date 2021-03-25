@@ -34,16 +34,22 @@ Function.prototype.myApply = function(obj,args){
 
 
 ```
-Function.prototype.myBind = function (thisArg, ...args) {
-    var self = this
-    // new优先级
-    var fbound = function () {
-        self.apply(this instanceof self ? this : thisArg, args.concat(Array.prototype.slice.call(arguments)))
-    }
-    // 继承原型上的属性和方法
-    fbound.prototype = Object.create(self.prototype);
+// 第四版
+Function.prototype.bind2 = function (context) {
 
-    return fbound;
+    var self = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    var fNOP = function () {};
+
+    var fBound = function () {
+        var bindArgs = Array.prototype.slice.call(arguments);
+        return self.apply(this instanceof fNOP ? this : context, args.concat(bindArgs));
+    }
+
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+    return fBound;
 }
 
 ```
