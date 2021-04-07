@@ -33,6 +33,12 @@
 // 你能将算法的时间复杂度降低到 O(n log(n)) 吗?
 
 
+// 解题思路
+// dp[i]，表示以第i位作为结束字符子序列，能产生的最长上升序列长度
+// i前面的字符0到i用j表示。让第i位，分别跟在第j位作为结束字符子序列后面
+// nums[i] > nums[j]，dp[i] = dp[j] + 1。0到i会得到i个dp[i]，选最大值
+// dp包含数组每一位作为结束字符子序列的最长上升序列长度，选最大值
+
 /**
  * @param {number[]} nums
  * @return {number}
@@ -46,7 +52,9 @@ var lengthOfLIS = function(nums) {
     let max = 0
     for(var i = 0;i<n;i++){
         for(var j = 0;j<i;j++){
-            if(nums[j]<nums[i]){
+            //找出数组中 比nums[i] 小的数字 
+            if(nums[j]<nums[i]){ 
+                //dp包含数组每一位作为结束字符子序列的最长上升序列长度
                 dp[i] = Math.max(dp[i],dp[j]+1)
             }
         }
