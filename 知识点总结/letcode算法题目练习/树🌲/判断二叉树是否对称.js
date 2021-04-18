@@ -48,9 +48,12 @@
  var isSymmetric = function(root) {
     if(!root)return true
     var isEqual = function (left,right){
-        if(!left&&!right)return true
-        if(!left || !right)return false
-        return left.val === right.val && isEqual(left.left,right.right)&&isEqual(left.right,right.left)
+        if(!left&&!right)return true //当左右子节点都不存 
+        if(!left || !right)return false //如果 左子节点 或右子节点 有值 说明不对称
+        //递归遍历 判断子节点的值相等 
+        // 且 左子树的左节点与右子树的右节点 相等 
+        // 且 左子树的右节点与右子树的左节点 相等 此时二叉树才对称。
+        return left.val === right.val && isEqual(left.left,right.right)&&isEqual(left.right,right.left) 
     }
    return  isEqual(root.left,root.right)
 };
