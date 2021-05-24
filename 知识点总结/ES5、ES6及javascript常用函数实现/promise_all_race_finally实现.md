@@ -91,6 +91,7 @@ function allSettled(promises) {
   
   return new Promise((resolve, reject) => {
     const result = []
+    //使用变量记录所有的promise的个数 
     let unSettledPromiseCount = _promises.length
     
     _promises.forEach((promise, index) => {
@@ -100,8 +101,9 @@ function allSettled(promises) {
           value
         }
         
+        //每次某个promise状态变化 将个数减少 
         unSettledPromiseCount -= 1
-        // resolve after all are settled
+        // 没有promise 可以执行后 将结果数组返回 
         if (unSettledPromiseCount === 0) {
           resolve(result)
         }
@@ -110,9 +112,9 @@ function allSettled(promises) {
           status: 'rejected',
           reason
         }
-        
+         //每次某个promise状态变化 将个数减少 
         unSettledPromiseCount -= 1
-        // resolve after all are settled
+        // 没有promise 可以执行后 将结果数组返回 
         if (unSettledPromiseCount === 0) {
           resolve(result)
         }
