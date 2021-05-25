@@ -47,3 +47,14 @@ newChildren遍历完，oldFiber没遍历完意味着需要删除fiber节点
 newChildren与oldFiber都没遍历完，这意味着有节点在这次更新中改变了位置。
 
 为了快速的找到key对应的oldFiber，我们将所有还没处理的oldFiber放进以key属性为key，Fiber为value的map。
+
+再遍历剩余的newChildren，通过newChildren[i].key就能在existingChildren中找到key相同的oldFiber。
+
+在我们第一轮和第二轮遍历中，我们遇到的每一个可以复用的节点，一定存在一个代表上一次更新时该节点状态的oldFiber，并且页面上有一个DOM元素与其对应。
+那么我们在Diff函数的入口处，定义一个变量 let lastPlacedIndex = 0;
+
+该变量表示当前最后一个可复用节点，对应的oldFiber在上一次更新中所在的位置索引。我们通过这个变量判断节点是否需要移动
+
+如果 oldIndex >= lastPlacedIndex 代表该可复用节点不需要移动
+并将 lastPlacedIndex = oldIndex;
+如果 oldIndex < lastplacedIndex 该可复用节点之前插入的位置索引小于这次更新需要插入的位置索引，代表该节点需要向右移动
