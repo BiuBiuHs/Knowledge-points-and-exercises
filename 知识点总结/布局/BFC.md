@@ -15,7 +15,7 @@ https://juejin.im/post/59b73d5bf265da064618731d
 ### BFC的应用?
 ```
     1. 内部的Box会在内部竖直的一个接一个放置,外部的float不会影响内部元素
-    2. Box垂直距离由margin决定，属于同一个BFC的两个Box的margin会相互重叠   (触发不同BFC, 防止margin重叠)
+    2. Box垂直距离由margin决定，属于同一个BFC的两个Box的margin会相互重叠   (触发不同BFC, 防止margin重叠) 只有上下margin 会折叠 左右一般不会
     3. 每个元素的margin box左边与包含块的左边相接触,即使存在浮动
     4. BFC区域不会与float box相重叠     (两栏布局)
     5. BFC内的子元素不会与外部元素相互影响
