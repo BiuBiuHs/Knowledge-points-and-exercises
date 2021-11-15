@@ -36,3 +36,13 @@ function curry(fn, ...args) {
         }
     }
 }
+
+//极简版 
+function myCurry (targetfn) {
+    var numOfArgs = targetfn.length;
+    if (arguments.length - 1 < numOfArgs) {
+      return myCurry.bind(null, ...arguments);
+    } else {
+      return targetfn.apply(null, Array.prototype.slice.call(arguments, 1));
+    }
+  }
