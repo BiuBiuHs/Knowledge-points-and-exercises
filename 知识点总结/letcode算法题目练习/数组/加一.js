@@ -43,9 +43,9 @@
        for(var i =len - 1; i >= 0; i--){
            digits[i]++
            digits[i] %= 10
-           if(digits[i]!= 0) return digits
+           if(digits[i]!= 0) return digits //当某一位不为0 说明可以返回了
        }
-       digits = [...Array(len + 1)].map(_=>0)
+       digits = [...Array(len + 1)].map(_=>0)  //当走到这里时说明 所有位都为0  也就是 N个9 的情况 此时只需要填充len + 1 长度的数组的值为0 并将设置进位 为1 即可
        digits[0] = 1
        return digits
    
