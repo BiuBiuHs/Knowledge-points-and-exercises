@@ -1,6 +1,7 @@
 ### promise.all 实现
 
 #### 1.0 简单实现
+>> 彼此相互依赖，其中任何一个被 reject ，其它都失去了实际价值
 ```
     Promise.all = function(promises) {
     let results = [];
@@ -79,6 +80,10 @@
 ```
 
 ### promise.allsettle
+
+>> 彼此不依赖，其中任何一个被 reject ，对其它都没有影响
+>> 期望知道每个 promise 的执行结果
+
 
 ```
 
