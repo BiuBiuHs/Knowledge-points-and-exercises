@@ -168,7 +168,12 @@ var testMeasres = [
     },
 ]
 
-
+var mergeMeasureWithIndex = (measureObjArr,index)=>{
+   return  measureObjArr.map(item=>({
+        ...item,
+        unique_id:item.unique_id +index
+    }))
+}
 
 /**
  * 
@@ -176,6 +181,7 @@ var testMeasres = [
  * @param {*} lastColumnFieldIdKey  最后一个列维度的 unique_Id
  * @param {*} hasColumnTotal 是否有组内列合计
  */
+let leafNodeCount = 0
 var addTargetSubNode = ({nodeArr,lastColumnFieldIdKey,measureObj,hasColumnTotal})=>{
     //处理合计逻辑
     const fieldIdkeyArr = nodeArr.map(item => item.unique_id)
@@ -202,9 +208,11 @@ var addTargetSubNode = ({nodeArr,lastColumnFieldIdKey,measureObj,hasColumnTotal}
             }
            
         }else{
+            leafNodeCount++
             return {
                 ...item,
-                children:measureObj
+                children:mergeMeasureWithIndex(measureObj,leafNodeCount),
+                dataMeasureIndex:leafNodeCount
             }
         }
 
@@ -212,6 +220,8 @@ var addTargetSubNode = ({nodeArr,lastColumnFieldIdKey,measureObj,hasColumnTotal}
 
 
 }
+
+
 
 addTargetSubNode({
     nodeArr:testNode,lastColumnFieldIdKey:'C',measureObj:testMeasres,hasColumnTotal:true,
