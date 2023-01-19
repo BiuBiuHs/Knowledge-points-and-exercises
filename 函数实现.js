@@ -21,18 +21,58 @@ var DFS = (obj,columnFieldIdArr)=>{
     let parentObj = {
         originName:obj[parentKey]??'置空节点',
         unique_id:parentKey,
-        children:[]
     }
+    if(columnFieldIdArr.length === 1)return parentObj
     //dfs 由于最后结束条件返回undefined 所以最后一级的表头数据结构的children中可能存在undefined
-    parentObj.children.push(DFS(obj,shadowArr))
+    parentObj.children = [DFS(obj,shadowArr)]
+    
     return parentObj
 
 }
 
 
+DFS(  {
+    A:'华北',
+    B:'北京',
+    C:'海淀'
+},['A','B','C',])
+
+
+
+
+[ //行维度
+{
+    "originName": "置空节点",
+    "unique_id": "A",
+    "children": [
+        {
+            "originName": "置空节点",
+            "unique_id": "B",
+            "children": [
+                {
+                    "originName": "置空节点",
+                    "unique_id": "C",
+                    "children": [
+                        {
+                            "originName": "商品数量",
+                            "unique_id": "E"
+                        },
+                        {
+                            "originName": "日期",
+                            "unique_id": "F"
+                        }
+                    ],
+                    "dataMeasureIndex": 18
+                }
+            ]
+        }
+    ]
+}]
+
 var columnFieldIdArr = ['A','B','C']
 
 var testNode =[
+   
     {
         "originName": "华北",
         "unique_id": "A",
@@ -44,9 +84,6 @@ var testNode =[
                     {
                         "originName": "海淀",
                         "unique_id": "C",
-                        "children": [
-                            null
-                        ]
                     }
                 ]
             },
@@ -57,99 +94,22 @@ var testNode =[
                     {
                         "originName": "武清",
                         "unique_id": "C",
-                        "children": [
-                            null
-                        ]
                     }
                 ]
             }
         ]
     },
     {
-        "originName": "华东",
+        "originName": "置空节点",
         "unique_id": "A",
         "children": [
             {
-                "originName": "江苏",
+                "originName": "置空节点",
                 "unique_id": "B",
                 "children": [
                     {
-                        "originName": "无锡",
+                        "originName": "总和",
                         "unique_id": "C",
-                        "children": [
-                            null
-                        ]
-                    }
-                ]
-            },
-            {
-                "originName": "上海",
-                "unique_id": "B",
-                "children": [
-                    {
-                        "originName": "浦东",
-                        "unique_id": "C",
-                        "children": [
-                            null
-                        ]
-                    }
-                ]
-            },
-            {
-                "originName": "浙江",
-                "unique_id": "B",
-                "children": [
-                    {
-                        "originName": "杭州",
-                        "unique_id": "C",
-                        "children": [
-                            null
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "originName": "华南",
-        "unique_id": "A",
-        "children": [
-            {
-                "originName": "福建",
-                "unique_id": "B",
-                "children": [
-                    {
-                        "originName": "厦门",
-                        "unique_id": "C",
-                        "children": [
-                            null
-                        ]
-                    }
-                ]
-            },
-            {
-                "originName": "广东",
-                "unique_id": "B",
-                "children": [
-                    {
-                        "originName": "佛山",
-                        "unique_id": "C",
-                        "children": [
-                            null
-                        ]
-                    }
-                ]
-            },
-            {
-                "originName": "深圳",
-                "unique_id": "B",
-                "children": [
-                    {
-                        "originName": "南山",
-                        "unique_id": "C",
-                        "children": [
-                            null
-                        ]
                     }
                 ]
             }
@@ -168,10 +128,11 @@ var testMeasres = [
     },
 ]
 
-var mergeMeasureWithIndex = (measureObjArr,index)=>{
+//合并指标数据结构与index
+var mergeMeasureWithIndex = (measureObjArr,index,needMergeIndex)=>{
    return  measureObjArr.map(item=>({
         ...item,
-        unique_id:item.unique_id +index
+        unique_id:needMergeIndex?item.unique_id +index:item.unique_id
     }))
 }
 
@@ -182,10 +143,12 @@ var mergeMeasureWithIndex = (measureObjArr,index)=>{
  * @param {*} hasColumnTotal 是否有组内列合计
  */
 let leafNodeCount = 0
-var addTargetSubNode = ({nodeArr,lastColumnFieldIdKey,measureObj,hasColumnTotal})=>{
-    //处理合计逻辑
+var addMeasureSubNode = ({nodeArr,lastColumnFieldIdKey,measureObj,hasinnerColumnTotal,needMergeIndex=false})=>{
+    //处理组内合计逻辑
     const fieldIdkeyArr = nodeArr.map(item => item.unique_id)
-    if(hasColumnTotal && fieldIdkeyArr.includes(lastColumnFieldIdKey) ){
+    const fieldValArr = nodeArr.map(item=>item.originName)
+    //处理总和列 不能push 合计
+    if(hasinnerColumnTotal && fieldIdkeyArr.includes(lastColumnFieldIdKey)&& !fieldValArr.includes('总和') ){
         nodeArr.push({
                     originName:'合计',
                     unique_id:lastColumnFieldIdKey,
@@ -199,11 +162,12 @@ var addTargetSubNode = ({nodeArr,lastColumnFieldIdKey,measureObj,hasColumnTotal}
         if(unique_id!==lastColumnFieldIdKey){
             return {
                 ...item,
-                children:addTargetSubNode({
+                children:addMeasureSubNode({
                     nodeArr: item.children,
                     lastColumnFieldIdKey,
                     measureObj,
-                    hasColumnTotal,
+                    hasinnerColumnTotal,
+                    needMergeIndex
                 })
             }
            
@@ -211,21 +175,56 @@ var addTargetSubNode = ({nodeArr,lastColumnFieldIdKey,measureObj,hasColumnTotal}
             leafNodeCount++
             return {
                 ...item,
-                children:mergeMeasureWithIndex(measureObj,leafNodeCount),
+                children:mergeMeasureWithIndex(measureObj,leafNodeCount,needMergeIndex),
                 dataMeasureIndex:leafNodeCount
             }
         }
 
     })
-
-
 }
 
 
-
-addTargetSubNode({
-    nodeArr:testNode,lastColumnFieldIdKey:'C',measureObj:testMeasres,hasColumnTotal:true,
+//给处理好的只包含列维度数据的表头中 添加指标数据结构 与组内合计数据结构
+addMeasureSubNode({
+    nodeArr:testNode,lastColumnFieldIdKey:'C',measureObj:testMeasres,hasinnerColumnTotal:true,needMergeIndex:true
 })
+
+const emptyNode =  [{
+    "originName": "置空节点",
+    "unique_id": "A",
+    "children": [
+        {
+            "originName": "置空节点",
+            "unique_id": "B",
+            "children": [
+                {
+                    "originName": "置空节点",
+                    "unique_id": "C",
+                    "children": [
+                        null
+                    ]
+                }
+            ]
+        }
+    ]
+}]
+
+const testFieldObj= [
+    {
+        originName:'商品数量',
+        unique_id:'E'
+    },{
+        originName:'日期',
+        unique_id:'F'
+    }
+]
+
+//处理行维度 
+addMeasureSubNode({
+    nodeArr:emptyNode,lastColumnFieldIdKey:'C',measureObj:testFieldObj,hasinnerColumnTotal:false,needMergeIndex:false
+})
+
+
 
 
 
@@ -233,13 +232,13 @@ addTargetSubNode({
 var mergeHeaderItem = ({headerItemObj,columnFieldIdArr=[],nextItem={},deepth=1})=> {
     if (deepth >= columnFieldIdArr.length) return;
     //按列维度的顺序 遍历每个层级下的children数组
-    let subChildrenArr = headerItemObj.children;
+    let subChildrenArr = headerItemObj?.children;
     //获取某个层级的所有子节点的值
-    let NameArr = subChildrenArr.map((item) => item.originName);
+    let NameArr = subChildrenArr?.map((item) => item.originName);
     //获取下条数据的第I个key的值
     let curColumnFieldVal = nextItem[columnFieldIdArr[deepth]];
     //说明已经有相同的值已经保存在节点数中并且不是最后一个层级的表头
-    if (NameArr.includes(curColumnFieldVal) && deepth !== columnFieldIdArr.length - 1) {
+    if (NameArr && NameArr.includes(curColumnFieldVal) && deepth !== columnFieldIdArr.length - 1) {
       const sameNameItemIndex = subChildrenArr.findIndex((item) => item.originName === curColumnFieldVal);
       //生成新的子节点数组
       const newSubItem = mergeHeaderItem({
@@ -266,7 +265,7 @@ var mergeHeaderItem = ({headerItemObj,columnFieldIdArr=[],nextItem={},deepth=1})
 
 
 
-
+//初次生成只包含列维度的表头
 var formatHeader = (headerArr = [],columnFieldIdArr) => {
     //只记录是否生成过 第一层表头的key值
     const fieldValMap = {};
@@ -301,6 +300,7 @@ var formatHeader = (headerArr = [],columnFieldIdArr) => {
 
 var columnFieldIdArr = ['A','B','C']
 
+//
 var headerArr = [
     {
         A:'华北',
@@ -345,11 +345,25 @@ var headerArr = [
 
 ]
 
-
-
+//初次生成只包含列维度的表头
 formatHeader(headerArr,columnFieldIdArr)
 
 
+//生成最后的列总和 数据结构
+var getOuterColumnTotal = (columnFieldIdArr)=>{
+    const lastColumnFieldIdKey = [...columnFieldIdArr].pop()
+    //没有配置列维度
+    if(!columnFieldIdArr.length) return {
+        originName:'总和',
+        unique_id:lastColumnFieldIdKey,
+        children:[]
+    }
+    const columnTotalObj = {[lastColumnFieldIdKey]:'总和'}
+    return DFS(columnTotalObj,columnFieldIdArr)
+
+}
+
+getOuterColumnTotal(['A','B','C'])
 
 //根据列的层级获取第N级的路径
 const getPath = (number,str = '')=>{
@@ -358,6 +372,7 @@ const getPath = (number,str = '')=>{
     str += getPath(number,'children.');
     return str
 }
+
 //'children.children.children' 
 // getPath(3)
 
@@ -378,24 +393,9 @@ var a = {
                         null
                     ]
                 },
-                {
-                    "originName": "朝阳",
-                    "unique_id": "C",
-                    "children": []
-                }
+                
             ]
         },
-        {
-            "originName": "天津",
-            "unique_id": "B",
-            "children": [
-                {
-                    "originName": "武清",
-                    "unique_id": "C",
-                    "children": []
-                }
-            ]
-        }
     ]
 }
 
@@ -404,8 +404,8 @@ mergeHeaderItem({
     columnFieldIdArr:['A','B','C'],
     nextItem:{
         A:'华北',
-        B:'北京',
-        C:'通州',
+        B:'河北',
+        C:'廊坊',
     },
 })
 
@@ -414,5 +414,5 @@ DFS(  {
     A:'华北',
     B:'北京',
     C:'海淀'
-},['A','B','C',"D"])
+},['A','B','C',])
 
