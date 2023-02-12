@@ -1,4 +1,4 @@
-//leetcode-cn.com/problems/er-cha-sou-suo-shu-de-di-kda-jie-dian-lcof/
+//http://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-di-kda-jie-dian-lcof/
 // 剑指 Offer 54. 二叉搜索树的第k大节点
 // 给定一棵二叉搜索树，请找出其中第k大的节点。
 
@@ -38,7 +38,7 @@
  * @param {number} k
  * @return {number}
  */
-https: var kthLargest = function (root, k) {
+var kthLargest = function (root, k) {
   let stack = [];
   var dfs = function (node) {
     if (node == null) return;
