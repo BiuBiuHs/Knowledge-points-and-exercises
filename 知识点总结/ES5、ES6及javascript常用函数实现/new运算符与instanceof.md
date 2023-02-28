@@ -15,6 +15,23 @@ new 运算接受一个构造器和一组调用参数，实际上做了几件事�
     return res.isObject()?res :F
     
  }
+
+ //https://github.com/mqyqingfeng/Blog/issues/13
+
+ // 最终版的代码
+function objectFactory() {
+
+    var obj = new Object(),//创建一个新的对象
+
+    Constructor = [].shift.call(arguments);
+
+    obj.__proto__ = Constructor.prototype;
+
+    var ret = Constructor.apply(obj, arguments);
+
+    return typeof ret === 'object' ? ret : obj;
+
+};
  
  ```
  #### instanceof 是通过判断对象的 prototype 链来确定这个对象是否是某个类的实例，而不关心对象与类的自身结构。
