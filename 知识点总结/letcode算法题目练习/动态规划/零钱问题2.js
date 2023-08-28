@@ -33,7 +33,7 @@
 // 硬币种类不超过 500 种
 // 结果符合 32 位符号整数
 
-
+var amount = 5, coins = [1, 2, 5]
 /**
  * @param {number} amount
  * @param {number[]} coins
@@ -45,7 +45,7 @@
     dp[0] = 1 //当金额为0 时 只有一种组合方式 不使用任何硬币 
     for (let coin of coins) { //遍历 不同金额 硬币数组
         for (let j = coin; j < amount + 1; ++j) { //对于每个面值的硬币 我们从0开始 递归累加到amount金额 
-            //从0开始递推
+            //从0开始递推  新出现的dp[x] 在dp数组中默认为0 
             dp[j] += dp[j - coin] //计算组合数量 
 
         }
