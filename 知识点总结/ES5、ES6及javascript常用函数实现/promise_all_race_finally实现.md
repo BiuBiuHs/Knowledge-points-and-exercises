@@ -27,10 +27,10 @@
         let promiseCount = 0;
         let promisesLength = promises.length;
         return new Promise(function(resolve, reject) {
-            for (let val of promises) {
-            Promise.resolve(val).then(function(res) {
+            promises.forEach((item,index)=>{
+              Promise.resolve(val).then(function(res) {
                 promiseCount++;
-                // results.push(res);
+                //直接使用index 保证顺序
                 results[i] = res;
                 // 当所有函数都正确执行了，resolve输出所有返回结果。
                 if (promiseCount === promisesLength) {
@@ -40,6 +40,7 @@
                 return reject(err);
             });
             }
+            ) 
         });
     };
 ```
