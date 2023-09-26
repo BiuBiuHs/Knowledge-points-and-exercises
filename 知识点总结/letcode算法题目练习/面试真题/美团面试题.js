@@ -10,3 +10,14 @@ function getObjAttr(obj, str) {
 
 var res = getObjAttr({ a: { b: { c: 1 } } }, "a.b.c.d");
     
+
+function getObjAttr (obj,path) {
+  if (obj == undefined || !path) return obj;
+  const pathArr = path.split('.')
+  while(pathArr.length){
+    const curKey = pathArr.shift()
+    obj = obj[curKey] 
+  }
+  return obj
+}
+var res = getObjAttr({ a: { b: { c: 1 } } }, "a.b.c.d");
