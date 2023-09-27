@@ -20,3 +20,17 @@ Array.prototype.myReduce = function (...args) {
   
   // [1,2,3].myReduce((prev,next)=>{return prev + next},0)
   
+
+  //map
+
+  Array.prototype.myMap = function (func,thisObj) {
+    const res = []
+
+    this.forEach((...args)=>{
+        //此时args就是一个数组 [item,index] 
+        const index = args[1]
+        //调用callback 函数 apply参数为一个数组 
+        //callback可以只读取item的值，但是需要支持读取index的值
+        res[index] = func.apply(thisObj,args)
+    })
+  }
