@@ -18,7 +18,11 @@ function getObjAttr (obj,path) {
   const pathArr = path.split('.')
   while(pathArr.length){
     const curKey = pathArr.shift()
-    obj = obj[curKey] 
+    if(typeof obj ==='object' && obj?.[curKey] ){
+      obj = obj[curKey]
+    }else{
+      return undefined
+    }
   }
   return obj
 }
