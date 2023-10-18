@@ -37,6 +37,25 @@ function curry(fn, ...args) {
     }
 }
 
+//其他版本 
+
+/**
+ * @param { (...args: any[]) => any } fn
+ * @returns { (...args: any[]) => any }
+ */
+function curry(fn) {
+  // your code here
+  return function curryInner (...args) {
+      if(args.length >= fn.length) return fn.apply(this,args)
+      //bind函数会将 传入的参数插入到下一次函数调用的参数的前面 
+    // curryInner.bind(this,...args) === (...args2) => curryInner(...args,...args2)
+      return curryInner.bind(this,...args)
+  }
+}
+
+
+
+
 //极简版 
 function myCurry (targetfn) {
     var numOfArgs = targetfn.length;
