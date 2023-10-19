@@ -1,10 +1,9 @@
 
 //github地址
 https://github.com/mqyqingfeng/Blog/issues/22
-### 函数防抖实现
-每次点击都会清除上一个定时器 函数 ，重新生成一个新的定时器函数 ，一段时间后执行
+// ### 函数防抖实现
+// 每次点击都会清除上一个定时器 函数 ，重新生成一个新的定时器函数 ，一段时间后执行
 
-```
     function debounc(func,dely){
         let timer = null
         return function () {
@@ -49,12 +48,12 @@ https://github.com/mqyqingfeng/Blog/issues/22
 
         return debounced;
     }
-```
 
-## 函数节流
 
-每隔一段时间 执行一次 
-```
+
+// ## 函数节流
+
+// 每隔一段时间 执行一次 
     function throttle(func,dely){
         let flag = true 
         return function() {
@@ -68,10 +67,10 @@ https://github.com/mqyqingfeng/Blog/issues/22
     }
 
 
-    节流博客版本
-    /**
- * 第五版 添加取消方法 用法跟 debounce 相同
- */
+//  节流
+//  /**
+//  * 第五版 添加取消方法 用法跟 debounce 相同
+//  */
 
     var count = 1;
     var container = document.getElementById('container');
@@ -128,4 +127,60 @@ https://github.com/mqyqingfeng/Blog/issues/22
         return throttled;
     }
 
-```
+
+
+    //BFE.dev
+    //节流 
+    function throttle(func, wait, option = { leading: true, trailing: true }) {
+        var { leading, trailing } = option;
+        var lastArgs = null;
+        var timer = null;
+      
+        const setTimer = () => {
+          if (lastArgs && trailing) {
+            func.apply(this, lastArgs);
+            lastArgs = null;
+            timer = setTimeout(setTimer, wait);
+          } else {
+            timer = null;
+          }
+        };
+      
+        return function (...args) {
+          if (!timer) {
+            if (leading) {
+              func.apply(this, args);
+            }
+            timer = setTimeout(setTimer, wait);
+          } else {
+            lastArgs = args;
+          }
+        }
+      }
+
+      //防抖
+    //每次输入都会清空上一个timer 开启一个新的timer  等到停止输入后指定的秒数后 出发callback 
+      function debounce(func, wait, option = {leading: false, trailing: true}) {
+        let timer = null
+      
+        return function(...args) {
+      
+          let isInvoked = false
+          // if not cooling down and leading is true, invoke it right away
+          if (timer === null && option.leading) {
+            func.call(this, ...args)
+            isInvoked = true
+          }
+      
+          // no matter what, timer needs to be reset
+          window.clearTimeout(timer)
+          timer = window.setTimeout(() => {
+            if (option.trailing && !isInvoked) {
+              func.call(this, ...args)
+            }
+      
+            timer = null
+          }, wait)
+        }
+      }
+
