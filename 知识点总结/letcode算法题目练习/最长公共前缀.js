@@ -34,15 +34,15 @@ var longestCommonPrefix = function(strs) {
     for(var i = 1; i < strs.length ;i++){
         //遍历前一个字符串 与后一个字符串的 每一位字符 
         for(var j= 0; j < ans.length && j < strs[i].length; j++){
-            // 不想等后 将字符串 从0 截取到j
+            // 不相等后 终止此次for循环
             if(ans[j] != strs[i][j]){
                 break;
             }
         }
+        // 将字符串 从0 截取到j 复制给ans 就是目前的最长公共前缀 
         ans = ans.substr(0,j)
         //如果字符串是空的 说明没有相同的前缀 直接返回空即可满足题目要求
-        if(ans === '')
-        return ans
+        if(ans === '') return ans
     }
     return ans
 };
