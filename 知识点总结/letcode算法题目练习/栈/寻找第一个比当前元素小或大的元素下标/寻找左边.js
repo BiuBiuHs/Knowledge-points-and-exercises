@@ -8,7 +8,7 @@ function leftFirstMinItem (arr) {
     // 寻找坐标此时需要从数组末尾开始遍历
     for(var i = arr.length -1; i >=0; i--){
         let curItem = arr[i]
-        while(stack.length && arr[stack[stack.length -1]] > cur ){
+        while(stack.length && arr[stack[stack.length -1]] > curItem ){
             const index = stack.pop()
             ans[index] = i
         }
@@ -33,7 +33,7 @@ function leftFirstMaxItem (arr) {
     // 寻找坐标此时需要从数组末尾开始遍历
     for(var i = arr.length -1; i >=0; i--){
         let curItem = arr[i]
-        while(stack.length && arr[stack[stack.length -1]] < cur ){
+        while(stack.length && arr[stack[stack.length -1]] < curItem ){
             const index = stack.pop()
             ans[index] = i
         }
