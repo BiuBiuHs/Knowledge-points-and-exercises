@@ -46,7 +46,8 @@ var maxSlidingWindow = function(nums, k) {
   //下方就是单调递减队
   //eg：【9，8，6】
   const dequeue = function  (val) {
-    //要注意这里出栈每次只会弹出一个元素 且需要是最大的元素才会出栈
+    //要注意这里出栈每次只会弹出一个元素 且需要是最大的元素才会出队 
+    //此时出队的原因是 队首元素已经不在当前窗口内
       if(queue.length && val == queue[0]){
           queue.shift()
       }
@@ -58,7 +59,7 @@ var maxSlidingWindow = function(nums, k) {
       if(i < k - 1) {
           continue;
       }
-      //将队头元素放到 暂时的答案当中 ，即为当前区域最大的元素
+      //将队头元素放到 暂时的答案当中 ，单调递减队列中队首 即为当前区域最大的元素
       ans.push(queue[0])
       //为什么取值为 i - k +1 
       //因为当A[i]时 进队必须要保证 A【i-k】个元素出队 这样才能保证队列中的元素最多有 k 个。

@@ -76,7 +76,11 @@ function deepClone(obj, map = new WeakMap()) {
   for (let k in obj) {
     // for in 会遍历到原型链上的属性，但是原型链上的属性其实是公用的
     if (obj.hasOwnProperty(k)) {
-      resObj[k] = deepClone(obj[k], map);
+        if(isObject(obj[k])) {
+          resObj[k] = deepClone(obj[k], map);
+        }else{
+          resObj[k] = obj[k]
+        }
     }
   }
   return resObj;
