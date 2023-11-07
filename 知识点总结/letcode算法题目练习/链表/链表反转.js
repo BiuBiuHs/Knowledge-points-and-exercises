@@ -35,6 +35,17 @@
     }
     return prev
 };
+//使用假头进行反转 
+var rerverse = function (head) {
+    const dummy = new ListNode()
+    while(head) {
+        const back = head.next;
+        head.next  = dummy.next 
+        dummy.next = head
+        head = back
+    }
+    return dummy.next
+}
 
 //递归
 
