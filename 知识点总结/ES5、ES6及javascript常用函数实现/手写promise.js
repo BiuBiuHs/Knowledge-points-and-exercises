@@ -117,19 +117,20 @@ class MyPromise {
 
   static all(promises) {
     return new MyPromise((resolve, reject) => {
-      const values = [];
-      promises.forEach(promise => {
-        promise.then(
-          res => {
-            values.push(res);
-            if (values.length === promises.length) {
-              resolve(values);
-            }
-          },
-          err => {
-            reject(err);
-          }
-        );
+      const res = [];
+      //必须要用这个count来计算是否所有的promise都执行完成了 
+      let count = 0
+      promises.forEach(async (el,index) => {
+        try {
+          const subValue = await el();
+          //用index来保证 promise结果的顺序
+          //因为promise执行完成的时间可能不一致
+          res[index] = subValue;
+          count++;
+          if (count === functions.length) resolve(res);
+        } catch (err) {
+          reject(err);
+        }
       });
     });
   }

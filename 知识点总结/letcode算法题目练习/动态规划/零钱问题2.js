@@ -33,7 +33,11 @@
 // 硬币种类不超过 500 种
 // 结果符合 32 位符号整数
 
+
+
 var amount = 5, coins = [1, 2, 5]
+
+//求零钱组成的组合 
 /**
  * @param {number} amount
  * @param {number[]} coins

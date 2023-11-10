@@ -23,3 +23,20 @@ function createRequest(tasks=[],pool){
         }
     })
 }
+
+
+/**
+ * @param {Function[]} functions
+ * @param {number} n
+ * @return {Function}
+ */
+var promisePool = async function(functions, n) {
+    const queue = [...functions];
+    async function wroker() {
+        while(queue.length > 0) {
+            await queue.shift()();
+        }
+    }
+    await Promise.allSettled([...new Array(n)].map(wroker))
+};
+ 

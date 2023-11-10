@@ -33,36 +33,50 @@
 
 
 //升序排列数组查找元素  使用时间复杂度为 O(log n) 的算法来解决 二分法最为合适 
-
-var reNums = function (nums,target,lower) {  //lower为true时 是找初始位置 也就是元素第一次出现的index
-    var left = 0 
-    var right = nums.length -1 
-    var ans = nums.length
-    while(left <= right){ //循环终止条件
-        let mid = Math.floor((left + right) / 2) //二分 取中间的index 
-        if(nums[mid] > target || (lower && nums[mid] >= target)){ //当前位置的元素大于、等于 目标（target）元素时说明目标元素在左区间 此时改变右侧指针
-            right = mid -  1
-            ans = mid
-        }else{ //当前元素小于目标元素 说明目标元素在右区间 改变左侧指针 
-            left = mid + 1 
-        }
-    }
-    return ans 
-}
-
-
 /**
  * @param {number[]} nums
  * @param {number} target
  * @return {number[]}
  */
 var searchRange = function(nums, target) {
-    let ans = [-1,-1];
-    let leftIndex = reNums(nums,target,true) //寻找元素第一次出现的位置 
-    let rightIndex = reNums(nums,target,false) - 1 //寻找第一个大于target的元素的index 那么此时的nums[index - 1] 就应该等于target 
-    if(leftIndex <= rightIndex &&rightIndex < nums.length && nums[leftIndex]===target && nums[rightIndex]===target){
-        //校验一下 题目的必需条件  满足则返回结果 否则返回【-1,-1】
-        return [leftIndex,rightIndex]
-    }
-    return ans
+
+    const ans = [-1,-1]
+    //target第一次出现的下标 
+  function lowerBound(nums,target) {
+      let left = 0 ,right = nums.length 
+      while(left < right ) {
+          const mid = Math.floor((left + right ) / 2) 
+          if(nums[mid] < target) {
+              left = mid + 1
+          }else{
+              right = mid
+          }
+      }
+      return left
+  }
+  //第一个大于target的元素的下标
+  function upperBound(nums,target) {
+      let left = 0 ,right = nums.length 
+      while(left < right ) {
+          const mid = Math.floor((left + right ) / 2) 
+          if(nums[mid] <= target) {
+              left = mid + 1
+          }else{
+              right = mid
+          }
+      }
+      return left
+  }
+
+  let ansL = lowerBound(nums,target)
+  let ansR = upperBound(nums,target)
+
+    console.log(ansL,'ansL')
+    console.log(ansR,'ansR')
+  //利用target如果在数组中 那么必定 ansL 与ansR不想等 
+  //不在数组中 那么左右 必定不想等 
+  if(ansL== ansR) return ans
+  return [ansL,ansR - 1]
 };
+
+searchRange([5,6,7,7,8,9,9],5)
