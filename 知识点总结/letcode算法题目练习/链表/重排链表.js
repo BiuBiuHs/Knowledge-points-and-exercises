@@ -80,6 +80,7 @@ let reverseBack = reverse(back)
 
  //两条链表按顺序取元素连接到新链表上
  while(left&&right) {
+    //此处冗余逻辑见下方改写 
      const leftBack = left.next
      const rightBack = right.next
      left.next = right
@@ -92,6 +93,25 @@ let reverseBack = reverse(back)
  curPoint.next = left ? left :null 
 
 return dummy.next
+
+
+//改写更简洁的方式 
+while(left && right ) {
+    //保存后置节点 
+    let leftBack = left.next 
+    let rightBack = right.next 
+
+    /**
+     *  1.取出两个链表的第一个节点按照规则连接
+     *  2.连接后 立即移动指针道下一个节点 也就是后置及诶单
+     *  即可免去上方的写法 
+     */
+    left.next = right 
+    left = leftBack
+
+    right.next = left 
+    right = rightBack
+}
 
 
 
