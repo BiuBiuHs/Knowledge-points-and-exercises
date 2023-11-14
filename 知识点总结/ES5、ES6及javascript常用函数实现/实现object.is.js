@@ -13,3 +13,11 @@ const is = (val1, val2) => {
 
 // 看一下对于+0 === -0的处理逻辑，由于在严格相等中+0 === -0返回的是true，因为进入if逻辑中包含前述情况，
 // 由于Object.is属于对严格相等的功能补全，进入此逻辑中的其他情况都会返回true，因此return逻辑主要是处理+0、-0
+
+
+//在react的useEffect 中 对于deps（依赖项的比较就是使用object.is） 
+//object.is 的比较是浅比较 
+//对于值类型，对比值是否相同 ，
+//对于引用类型，则比较是否是形同的引用地址 ，相同则返回true 不同则为false 
+// eg:object.is(window,window)
+// eg:object.is({}},{}})
