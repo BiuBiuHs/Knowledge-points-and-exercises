@@ -22,6 +22,7 @@ no-cache：客户端缓存内容，但是是否使用缓存则需要经过协商
 no-store：所有内容都不会被缓存，即不使用强制缓存，也不使用协商缓存
 
 max-age=xxx (xxx is numeric)：缓存内容将在xxx秒后失效
+
 ![Alt text](https://user-gold-cdn.xitu.io/2018/4/19/162db635aa7b772b?imageView2/0/w/1280/h/960/format/webp/ignore-error/1 )
 
 HTTP响应报文中expires的时间值，是一个绝对值

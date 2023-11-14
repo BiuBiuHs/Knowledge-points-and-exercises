@@ -13,6 +13,9 @@
 
 #### Node.js中的eventLoop
 ![](https://user-gold-cdn.xitu.io/2018/6/29/1644b17495b10980?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+//node 与浏览器eventloop的区别
+//老版本的node存在与浏览器的eventloop 执行顺序不一致的问题 ，后续越来越趋近于统一标准，向浏览器的执行顺序靠近。
+![](https://zhuanlan.zhihu.com/p/54882306)
 
 1. timers：执行满足条件的setTimeout、setInterval回调。
 2. I/O callbacks：是否有已完成的I/O操作的回调函数，来自上一轮的poll残留。
@@ -21,7 +24,7 @@
 5. check：执行setImmediate的回调。
 6. close callbacks：关闭所有的closing handles，一些onclose事件。
 
-//老版本的node存在与浏览器的eventloop 执行顺序不一致的问题 ，后续越来越趋近于统一标准，向浏览器的执行顺序靠近。
+
 
 
 真正的执行顺序
