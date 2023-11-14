@@ -54,16 +54,15 @@ https://github.com/mqyqingfeng/Blog/issues/22
 // ## 函数节流
 
 // 每隔一段时间 执行一次 
-    function throttle(func,dely){
-        let flag = true 
-        return function() {
-            if(!flag ) return 
-            flag = false
-            setTimerout = (()=> {
-                func.call(this,arguments)
-                flag = true
-            },dely)
-        }
+    function throttle(func,delay) {
+      let timer = null
+      return function(){
+        if(time) return 
+        timer = setTimeout(()=>{
+          func.call(this,arguments)
+          timer = null
+        },delay)
+      }
     }
 
 

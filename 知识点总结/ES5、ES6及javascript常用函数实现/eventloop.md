@@ -21,6 +21,8 @@
 5. check：执行setImmediate的回调。
 6. close callbacks：关闭所有的closing handles，一些onclose事件。
 
+//老版本的node存在与浏览器的eventloop 执行顺序不一致的问题 ，后续越来越趋近于统一标准，向浏览器的执行顺序靠近。
+
 
 真正的执行顺序
 * 清空当前循环内的Timers Queue，清空NextTick Queue，清空Microtask Queue。
