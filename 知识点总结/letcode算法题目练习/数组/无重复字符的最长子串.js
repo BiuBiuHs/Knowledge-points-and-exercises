@@ -43,26 +43,29 @@
 
 // 在枚举结束后，我们找到的最长的子串的长度即为答案。
 
-//使用哈希集合去除重复的字符串 
 
+/**
+ * @param {string} s
+ * @return {number}
+ */
 var lengthOfLongestSubstring = function(s) {
-    // 哈希集合，记录每个字符是否出现过
-    const occ = new Set();
-    const n = s.length;
-    // 右指针，初始值为 -1，相当于我们在字符串的左边界的左侧，还没有开始移动
-    let rk = -1, ans = 0;
-    for (let i = 0; i < n; ++i) {
-        if (i != 0) {
-            // 左指针向右移动一格，移除一个字符
-            occ.delete(s.charAt(i - 1));
+    //使用map记录 每个字符最后出现的位置
+    const strMap = new Map()
+    //把left指向 相当于我们在字符串的左边界的左侧，还没有开始移动
+    let left = -1
+    let ans = 0
+    //遍历字符串
+    for(var i = 0; i < s.length ; i++) {
+        //当重复的字符在上一次的边界右侧后 更新左侧边界 
+        while(strMap.get(s[i]) > left) {
+            left = strMap.get(s[i])
         }
-        while (rk + 1 < n && !occ.has(s.charAt(rk + 1))) {
-            // 不断地移动右指针
-            occ.add(s.charAt(rk + 1));
-            ++rk;
-        }
-        // 第 i 到 rk 个字符是一个极长的无重复字符子串
-        ans = Math.max(ans, rk - i + 1);
+        //更新字符的下标
+        strMap.set(s[i],i)
+        //贪心取到最大值 
+        //区间为 i 到left 的差值
+        //区间为左开右闭区间 
+        ans = Math.max(ans,i - left)
     }
-    return ans;
+    return ans 
 };

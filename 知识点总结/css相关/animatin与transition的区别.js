@@ -1,4 +1,5 @@
-// 1、transition 是过渡，是样式值的变化的过程，只有开始和结束；animation 其实也叫关键帧，通过和 keyframe 结合可以设置中间帧的一个状态；
+// 1、transition 是过渡，是样式值的变化的过程，只有开始和结束；
+// 2，animation 其实也叫关键帧，通过和 keyframe 结合可以设置中间帧的一个状态；
 
 // 2、animation 配合 @keyframe 可以不触发时间就触发这个过程，而 transition 需要通过 hover 或者 js 事件来配合触发；
 
