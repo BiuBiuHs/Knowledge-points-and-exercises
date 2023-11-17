@@ -16,8 +16,14 @@ const is = (val1, val2) => {
 
 
 //在react的useEffect 中 对于deps（依赖项的比较就是使用object.is） 
-//object.is 的比较是浅比较 
-//对于值类型，对比值是否相同 ，
-//对于引用类型，则比较是否是形同的引用地址 ，相同则返回true 不同则为false 
-// eg:object.is(window,window)
-// eg:object.is({}},{}})
+/**
+ * 
+    1.object.is 的比较是浅比较 
+
+    2.对于值类型，对比值是否相同 
+
+    3.对于引用类型，则比较是否是相同的引用地址 ，相同则返回true 不同则为false 
+
+    eg:object.is(window,window) true
+    eg:object.is({}},{}}) false
+ */
