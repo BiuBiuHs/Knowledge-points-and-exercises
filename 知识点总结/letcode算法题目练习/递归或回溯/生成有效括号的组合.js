@@ -29,6 +29,36 @@ var generateParenthesis = function(n) {
      return ans
 };
 
+//回溯算法。
+function backtrack(ans,cur, left, right, n) {
+    if(cur.length == n *2) {
+        ans.push(cur.toString());
+        return
+    }
+
+    if(left < n) {
+        cur.push('(')
+        backtrack(ans,cur,left + 1, right , n)
+        cur.pop()
+    }
+    if(right < left){
+        cur.push(')')
+        backtrack(ans,cur,left, right +1, n)
+        cur.pop()
+    }
+}
+
+
+/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var generateParenthesis = function(n) {
+    const result = []
+    generate(result ,'', 0, 0, n);
+    return result;
+};
+
 
 //js巧妙解
 var generateParenthesis = function(n) {
@@ -52,3 +82,5 @@ var generateParenthesis = function(n) {
      dfs(n,n,'')
      return ans
 };
+
+
