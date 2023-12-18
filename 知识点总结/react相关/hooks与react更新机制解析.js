@@ -24,3 +24,16 @@ import toFiber from '../图片资源/toFiber.jpg'
 // useMemo hooks实现
 // hook 的数据是存放在 fiber 的 memoizedState 属性的链表上的，每个 hook 对应一个节点，
 // 第一次执行 useXxx 的 hook 会走 mountXxx 的逻辑来创建 hook 链表，之后会走 updateXxx 的逻辑。
+
+
+//hooks的执行顺序
+
+usestate()
+useMemo()
+
+useLayoutEffect()
+useEffect()
+
+
+//调度器什么时候执行 
+//在浏览器渲染完一帧后 如果还有剩余时间则进行调度 。如果时间不够则不处理。 一帧大概是 1000/60 
