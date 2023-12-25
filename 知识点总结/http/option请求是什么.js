@@ -49,6 +49,6 @@ application/x-www-form-urlencoded
 /**
  * 如何优化
  * 
-如果不想让每个CORS复杂请求都出两次请求，可以设置Access-Control-Max-Age这个属性。
+如果不想让每个CORS复杂请求都出两次请求，可以设置Access-Control-Max-Age这个属性。（单位s）
 让浏览器缓存，在缓存的有效期内，所有options请求都不会发送。优化性能。
  */
