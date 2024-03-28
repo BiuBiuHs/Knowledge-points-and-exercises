@@ -18,6 +18,34 @@ function fetchStatus(url){
  *  调用 async 函数后 默认会得到一个 pending 状态的promise 需要使用then 来进行下一步操作 或 获取数据
  */
 
+/**
+ * 
+async function async1() {
+  console.log("async1 start");
+  await async2();
+  console.log("async1 end");
+}
+
+
+async function async2() {
+  console.log("async2");
+}
+
+*******重点看这里的定价转换******
+
+async 函数要等待所有的await 后跟随的函数执行完毕，且状态变更后才会执行 await后面的语句 
+相当于以下语句  then里面的都会放到此次微任务队列中等待执行。
+new promise((reslove,rej)=>{
+  console.log('async1 start')
+  async2()
+  resolve()
+}).then(()=>{
+  console.log('async1 end ')
+})
+
+ */
+
+
  //eg：执行顺序
 async function async1() {
     console.log("async1 start");
@@ -56,5 +84,4 @@ async function async1() {
 //   VM178:26 script end
 //   VM178:4 async1 end
 //   VM178:23 promise2
-//   undefined
 //   VM178:14 setTimeout
