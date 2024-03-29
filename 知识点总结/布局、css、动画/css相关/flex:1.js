@@ -1,5 +1,7 @@
 // flex:1 的含义 
 //flex:1 是 flex-grow flex-shrink flex-basis 的简写
+// flex:1 等同于 1 1 auto
+
 
 //flex:initial (0 1 auto)
 
