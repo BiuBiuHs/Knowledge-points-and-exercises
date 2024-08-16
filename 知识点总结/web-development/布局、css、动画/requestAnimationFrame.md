@@ -47,7 +47,7 @@
      }
     }
 
-    animate()
+   requestAnimationFrame(animate)
    }
   </script>
 
