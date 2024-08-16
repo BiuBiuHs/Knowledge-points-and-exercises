@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+
+		<script>
+			window.onload = () => {
+				var box = document.getElementById('box')
+				var distance = 0
+				var target = 500 // 目标距离
+				var speed = 2 // 每帧移动的距离
+
+				function animate() {
+					if (distance < target) {
+						distance += speed
+						box.style.left = distance + 'px'
+						requestAnimationFrame(animate)
+					}
+				}
+
+				animate()
+			}
+		</script>
+	</head>
+	<body>
+		<div
+			id="box"
+			style="
+				background: black;
+				width: 100px;
+				height: 100px;
+				position: absolute;
+				left: 0;
+			"
+		></div>
+	</body>
+</html>
