@@ -3,7 +3,9 @@
 ```
  arr.reduce(callback,[initialValue])
 ```
+
 ### callback(previousValue,currentValue,index,array)
+
 ```
 callback （执行数组中每个值的函数，包含四个参数）
 
@@ -14,6 +16,7 @@ callback （执行数组中每个值的函数，包含四个参数）
 
 initialValue （作为第一次调用 callback 的第一个参数。）
 ```
+
 ### 简单用法
 
 ```
@@ -23,6 +26,7 @@ var mul = arr.reduce((x,y)=>x*y)
 console.log( sum ); //求和，10
 console.log( mul ); //求乘积，24
 ```
+
 ### 其他用法
 
 #### 1.计算数组中每个元素出现的次数
@@ -65,6 +69,7 @@ let newArr = arr.reduce((pre,cur)=>{
 },[])
 console.log(newArr); // [0, 1, 2, 3, 4, 5]
 ```
+
 #### 4.将多维数组转化为一维
 
 ```
@@ -76,6 +81,7 @@ const newArr = function(arr){
 console.log(newArr(arr)); //[0, 1, 2, 3, 4, 5, 6, 7]
 
 ```
+
 #### 5.对象里的属性求和
 
 ```
