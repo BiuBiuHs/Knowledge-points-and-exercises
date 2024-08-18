@@ -1,54 +1,67 @@
+理解 `call`、`apply` 和 `bind` 的实现原理是深入掌握 JavaScript 的重要一步。让我们逐个实现这些方法：
 
+1. call 的实现：
 
-```
-Function.prototype.myCall= function(obj,...args){
-    const fn = Symbol('fn') //是的fn属性独一无二 不会重复 防止fn 覆盖已有属性
-    const obj = obj ||window
-    obj[fn]= this //this 就是此时调用的函数 function XXX 赋给传入的对象obj的fn属性
-    const res = obj[fn](...args)
-    delete obj[fn]
-    return res
-}
-```
+```javascript
+Function.prototype.myCall = function(context, ...args) {
+  // 如果没有传入 context 或传入的是 null/undefined，则使用全局对象
+  context = context || window;
+  
+  // 为 context 创建一个唯一的属性以储存函数
+  const fnSymbol = Symbol();
+  context[fnSymbol] = this;
 
-## 实现apply apply接受一个数组作为参数
+  // 执行函数并保存结果
+  const result = context[fnSymbol](...args);
 
-```
-Function.prototype.myApply = function(obj,args){
-    const fn = Symbol("fn");
-    const obj = obj || window
-    obj[fn] = this 
-    const res = obj[fn](...args)
-    delete obj[fn]
-    return res
+  // 删除添加的属性
+  delete context[fnSymbol];
 
-}
+  // 返回函数执行结果
+  return result;
+};
 ```
 
-## 实现bind 
+2. apply 的实现：
 
-* bind()除了this还接收其他参数，bind()返回的函数也接收参数，这两部分的参数都要传给返回的函数
-* new的优先级：如果bind绑定后的函数被new了，那么此时this指向就发生改变。此时的this就是当前函数的实例
-* 没有保留原函数在原型链上的属性和方法
+```javascript
+Function.prototype.myApply = function(context, argsArray) {
+  // 如果没有传入 context 或传入的是 null/undefined，则使用全局对象
+  context = context || window;
+  
+  // 为 context 创建一个唯一的属性以储存函数
+  const fnSymbol = Symbol();
+  context[fnSymbol] = this;
 
+  // 执行函数并保存结果
+  const result = argsArray ? context[fnSymbol](...argsArray) : context[fnSymbol]();
 
+  // 删除添加的属性
+  delete context[fnSymbol];
 
+  // 返回函数执行结果
+  return result;
+};
 ```
-//不考虑 new操作符实现
-Function.prototype.bind2 = function (context) {
 
-    var self = this;
-    // 获取bind2函数从第二个参数到最后一个参数
-    var args = Array.prototype.slice.call(arguments, 1);
+3. bind 的实现：
 
-    return function () {
-        // 这个时候的arguments是指bind返回的函数传入的参数
-        var bindArgs = Array.prototype.slice.call(arguments);
-        return self.apply(context, args.concat(bindArgs));
-    }
+```javascript
+Function.prototype.myBind = function(context, ...args1) {
+  const originalFunc = this;
 
-}
+  // 返回一个新函数
+  return function(...args2) {
+    // 合并参数
+    const allArgs = args1.concat(args2);
+    
+    // 使用 apply 来设置 this 并执行函数
+    return originalFunc.apply(context, allArgs);
+  };
+};
+```
 
+```javascript
 // 考虑 bind 后的函数 使用new操作符
 Function.prototype.bind2 = function (context) {
 
@@ -68,3 +81,25 @@ Function.prototype.bind2 = function (context) {
 }
 
 ```
+
+这些实现的关键点：
+
+1. 对于 `call` 和 `apply`：
+   - 我们将原函数作为一个临时属性添加到 `context` 对象上。
+   - 使用 `Symbol` 确保属性名的唯一性，避免覆盖已有属性。
+   - 执行这个临时添加的函数，然后删除它。
+   - 返回函数的执行结果。
+
+2. 对于 `bind`：
+   - 返回一个新函数。
+   - 新函数在执行时使用 `apply` 方法来设置 `this` 并传递参数。
+   - 支持函数柯里化，允许在 `bind` 时和之后调用时分别传入参数。
+
+3. 处理边界情况：
+   - 当 `context` 为 `null` 或 `undefined` 时，默认使用全局对象（浏览器中的 `window`，Node.js 中的 `global`）。
+
+4. 参数处理：
+   - `call` 和 `bind` 使用剩余参数 `...args` 来处理可变数量的参数。
+   - `apply` 直接使用传入的数组。
+
+这些实现展示了 `call`、`apply` 和 `bind` 的基本原理。实际的原生实现可能更复杂，包含更多的错误处理和边界情况考虑。理解这些实现有助于深入理解 JavaScript 中的 `this` 绑定机制和函数调用方式。
