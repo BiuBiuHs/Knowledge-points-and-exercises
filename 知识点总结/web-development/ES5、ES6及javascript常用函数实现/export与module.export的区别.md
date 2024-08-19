@@ -1,102 +1,82 @@
-在浏览器端 js 里面，为了解决各模块变量冲突等问题，往往借助于 js 的闭包把左右模块相关的代码都包装在一个匿名函数里。而 Nodejs 编写模块相当的自由，开发者
-只需要关注 require,exports,module 等几个变量就足够，而为了保持模块的可读性，很推荐把不同功能的代码块都写成独立模块，减少各模块耦合。
+`export` 和 `module.exports` 是 Node.js 中用于导出模块的两种不同方式，它们有一些重要的区别：
 
-在 node 的 js 模块里可以直接调用 exports 和 module 两个“全局”变量，但是 exports 是 module.exports 的一个引用。
+1. 语法和使用场景：
 
-```
-//plus.js
-function plus(a,b){
-  return a+b;
+   - `export` 是 ES6 (ECMAScript 2015) 引入的模块系统语法。
+   - `module.exports` 是 CommonJS 模块系统的语法，主要用于 Node.js。
+
+2. 导出方式：
+
+   - `export` 可以导出多个命名导出。
+   - `module.exports` 通常用于导出单个对象，但这个对象可以包含多个属性或方法。
+
+3. 导入方式：
+
+   - 使用 `export` 导出的模块，通过 `import` 语句导入。
+   - 使用 `module.exports` 导出的模块，通过 `require()` 函数导入。
+
+4. 灵活性：
+
+   - `export` 更灵活，可以导出变量、函数、类等，并且可以在文件的不同位置进行导出。
+   - `module.exports` 通常在文件末尾一次性导出所有内容。
+
+5. 兼容性：
+
+   - `export` 需要在支持 ES6 模块的环境中使用（如现代浏览器或配置了 ES6 支持的 Node.js）。
+   - `module.exports` 在所有版本的 Node.js 中都可以使用。
+
+示例对比：
+
+使用 `export`：
+
+```javascript
+// 文件：myModule.js
+export const PI = 3.14159;
+export function square(x) {
+    return x * x;
 }
-// 这样导出的 plus 是作为 exports 的一个方法被导出的
-exports.plus = plus;
-
-// main.js
-var Plus = require('plus');
-console.log(Plus.plus(1,2)); // 左边的 Plus 是 require 过来的模块名，右边的是它的 plus 方法。
-
-```
-
-在 node 编译的过程中，会把 js 模块封装成如下形式：
-```
-// require 是对 Node.js 实现查找模块的 Module._load 实例的引用
-// __finename 和 __dirname 是 Node.js 在查找该模块后找到的模块名称和模块绝对路径
-(function(exports,require,module,__filename,__dirname){
-  function plus(a,b){
-    return a+b;
-  }
-  exports.plus = plus;
-})
-
-```
-
-为了将函数直接导出成模块，而不是模块的一个方法，需要
-
-module.exports = plus;
-
-```
-
-// plus.js
-function plus(a,b){
-  return a+b ;
-}
-module.exports = plus;
-// main.js
-var plus = require('plus');
-console.log(plus(1,2));
-```
-exports = module.exports = {};
-
-exports 是 module.exports 的一个引用
-module.exports 初始值为一个空对象 {}，所以 exports 初始值也是 {}
-require 引用模块后，返回的是 module.exports 而不是 exports!!!!!
-exports.xxx 相当于在导出对象上挂属性，该属性对调用模块直接可见
-exports = 相当于给 exports 对象重新赋值，调用模块不能访问 exports 对象及其属性
-如果此模块是一个类，就应该直接赋值 module.exports，这样调用者就是一个类构造器，可以直接 new 实例。
-
-
-```
-var name = 'rainbow';
-exports.name = name;
-exports.sayName = function(){
-  console.log(name);
-}
-// 给 exports 赋值相当于给 module.exports 这个空对象添加了两个属性，相当于：
-var name = 'rainbow';
-module.exports.name = name;
-module.exports.sayName = function(){
-  console.log(name);
+export class Circle {
+    constructor(radius) {
+        this.radius = radius;
+    }
 }
 
+// 导入
+import { PI, square, Circle } from './myModule';
 ```
 
-```
+使用 `module.exports`：
 
-exports = function(){};
-// 这样就是重新给 exports 赋值，它将不再是 module.exports 的引用，二者将无任何联系。
-```
-```
-// index.js
-var something = require('./requireMe');
-something();
-// requireMe.js
-exports.something = function(){
-  console.log('am a function');
+```javascript
+// 文件：myModule.js
+const PI = 3.14159;
+function square(x) {
+    return x * x;
 }
-// 以上代码会报错，因为 require 出来的 module.exports 是一个object，不能直接执行
-
-//修改方式一
-// requireMe.js
-module.exports = function(){
-   console.log('am a function');
+class Circle {
+    constructor(radius) {
+        this.radius = radius;
+    }
 }
-// 当把代码改成上面这样，就不会报错，因为此时的 module.exports 是一个 function,可以直接执行。
-// 修改方式二
-// index.js
-var something = require('./requireMe');
-something.something();
-// 因为这时候 require 出来的是一个 object，有一个 something 的属性，所以可以这样调用执行。
+
+module.exports = {
+    PI,
+    square,
+    Circle
+};
+
+// 导入
+const myModule = require('./myModule');
+console.log(myModule.PI);
+console.log(myModule.square(4));
 ```
 
+注意事项：
 
+1. 在 Node.js 中，`exports` 是 `module.exports` 的引用。修改 `exports` 不会改变 `module.exports`，但修改 `module.exports` 会断开与 `exports` 的链接。
 
+2. 在使用 `module.exports` 时，通常推荐直接使用 `module.exports = {...}` 而不是 `exports.someProperty = ...`，以避免潜在的混淆。
+
+3. 现代 Node.js 版本支持 ES6 模块，但可能需要特定的文件扩展名（如 `.mjs`）或配置。
+
+选择使用哪种方式主要取决于你的项目环境、目标平台和个人或团队偏好。在纯 Node.js 环境中，`module.exports` 仍然很常见，而在更现代的或跨平台的项目中，ES6 的 `export` 可能更受欢迎。
