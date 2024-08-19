@@ -1,3 +1,4 @@
+//gpt 给出的实现方案
 class RequestQueue {
 	constructor(maxConcurrent) {
 		this.maxConcurrent = maxConcurrent
@@ -52,6 +53,8 @@ for (let i = 1; i <= 10; i++) {
 			console.log(`Received result: ${result}`)
 		})
 }
+
+//另类实现
 /**
  * @param {Function[]} functions
  * @param {number} n
