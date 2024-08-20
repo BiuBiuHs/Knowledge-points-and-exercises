@@ -1,8 +1,10 @@
 ### promise.all 实现
 
 #### 1.0 简单实现
+>>
 >> 彼此相互依赖，其中任何一个被 reject ，其它都失去了实际价值
-```
+
+```javascript
     Promise.all = function(promises) {
     let results = [];
     return new Promise(function(resolve) {
@@ -18,10 +20,11 @@
 ```
 
 #### 1.0 版本存在的问题
+
 * 一、Promise.all传递的参数可能不是Promise类型，可能不存在then方法。
 * 二、如果中间发生错误，应该直接返回错误，不执行后面操作。
 
-```
+``` javascript
     Promise.prototype.all = function(promises) {
         let results = [];
         let promiseCount = 0;
@@ -45,9 +48,9 @@
     };
 ```
 
-### promise.race 
+### promise.race
 
-```
+```javascript
     promise.prototype.race = function (promiseArr) {
 
         return new Promise((resolve,reject) => {
@@ -62,10 +65,9 @@
     }
 ```
 
-
 ### promise.finally
 
-```
+```javascript
     Promise.prototype.finally = function (callback) {
         return this.then((value) => {
             return Promise.resolve(callback()).then(() => {
@@ -84,7 +86,6 @@
 
 >> 彼此不依赖，其中任何一个被 reject ，对其它都没有影响
 >> 期望知道每个 promise 的执行结果
-
 
 ```
 
