@@ -3,7 +3,7 @@
 function* helloWorldGenerator() {
 	yield 'hello'
 	yield 'world'
-	return 'ending'
+	yield 'ending'
 }
 
 var hw = helloWorldGenerator()
@@ -14,6 +14,15 @@ hw.next() // { value: 'ending', done: true }
 hw.next() // { value: undefined, done: true }
 // 缺点: 每次都要自己手动调用next()
 // 优点： 函数能够暂停执行
+function* helloWorldGenerator() {
+	const x = yield 'hello'
+	const y = yield x + 'world'
+	yield y + 'ending'
+}
+
+// {value: 'helloworld', done: false}
+//{value: 'helloworldending', done: false}
+//{value: undefined, done: true}
 
 // 实现一个generator函数自动执行器函数  也就是 co模块
 function co(generatorFunction) {
@@ -26,6 +35,8 @@ function co(generatorFunction) {
 			}
 
 			Promise.resolve(nextResult.value)
+				//每次执行 generator.next() 会得到 yeild 后面的表达式执行后的值
+				// next() 方法可以接受一个参数，这个参数会成为上一个 yield 表达式的返回值。
 				.then((result) => step(generator.next(result)))
 				.catch((error) => reject(error))
 		}
