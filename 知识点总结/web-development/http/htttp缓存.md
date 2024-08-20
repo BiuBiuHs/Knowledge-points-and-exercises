@@ -1,90 +1,118 @@
+## HTTP 缓存机制分为强缓存和协商缓存，它们是提高网页性能和减少服务器负载的重要策略。让我们详细了解这两种缓存机制
 
-http://www.cnblogs.com/ziyunfei/archive/2012/11/17/2772729.html
-https://juejin.im/entry/5ad86c16f265da505a77dca4
+### 1. 强缓存（Strong Cache）
 
-### 永久性缓存
+强缓存是指在缓存期间不需要请求服务器就能够直接使用缓存的机制。
 
-### 强制缓存
-控制强制缓存的字段分别是Expires和Cache-Control，其中Cache-Control优先级比Expires高。
-#### Expires
-Expires是HTTP/1.0控制网页缓存的字段，其值为服务器返回该请求结果缓存的到期时间，即再次发起该请求时，如果客户端的时间小于Expires的值时，直接使用缓存结果。
-到了HTTP/1.1，Expire已经被Cache-Control替代，原因在于Expires控制缓存的原理是使用客户端的时间与服务端返回的时间做对比，那么如果客户端与服务端的时间因为某些原因（例如时区不同；客户端和服务端有一方的时间不准确）发生误差，那么强制缓存则会直接失效，这样的话强制缓存的存在则毫无意义
+特点：
 
-#### Cache-Control
-在HTTP/1.1中，Cache-Control是最重要的规则，主要用于控制网页缓存，主要取值为：
+- 不会发送请求到服务器
+- 直接从缓存中读取资源
+- 返回状态码通常是 200 (from cache)
 
-public：所有内容都将被缓存（客户端和代理服务器都可缓存）
+控制强缓存的 HTTP 头部：
 
-private：所有内容只有客户端可以缓存，Cache-Control的默认取值
+a) Expires（HTTP/1.0）
 
-no-cache：客户端缓存内容，但是是否使用缓存则需要经过协商缓存来验证决定
+- 指定资源的过期时间
+- 格式为 GMT 时间
+- 例如：Expires: Wed, 22 Nov 2023 08:50:00 GMT
 
-no-store：所有内容都不会被缓存，即不使用强制缓存，也不使用协商缓存
+b) Cache-Control（HTTP/1.1，优先级高于 Expires）
 
-max-age=xxx (xxx is numeric)：缓存内容将在xxx秒后失效
+- max-age：指定资源能够被缓存的最大时间（秒）
+- 例如：Cache-Control: max-age=3600
 
-![Alt text](https://user-gold-cdn.xitu.io/2018/4/19/162db635aa7b772b?imageView2/0/w/1280/h/960/format/webp/ignore-error/1 )
+### cache-control的常见参数
 
-HTTP响应报文中expires的时间值，是一个绝对值
+Cache-Control 是 HTTP/1.1 中用于控制缓存行为的重要头部字段。它包含多个可选的指令，可以组合使用。以下是 Cache-Control 的主要字段及其作用：
 
-HTTP响应报文中Cache-Control为max-age=600，是相对值
+1. 可缓存性
 
-由于Cache-Control的优先级比expires，那么直接根据Cache-Control的值进行缓存，意思就是说在600秒内再次发起该请求，则会直接使用缓存结果，强制缓存生效。
+a) public
 
-#### cache-control 字段
+- 表示响应可以被任何缓存存储，包括浏览器、CDN 等
 
-#### max-age
-该指令指定从当前请求开始，允许获取的响应被重用的最长时间（单位为秒。
-例如：Cache-Control:max-age=60表示响应可以再缓存和重用 60 秒。
-需要注意的是，在max-age指定的时间之内，浏览器不会向服务器发送任何请求，包括验证缓存是否有效的请求，
-也就是说，如果在这段时间之内，服务器上的资源发生了变化，那么浏览器将不能得到通知，而使用老版本的资源。
-所以在设置缓存时间的长度时，需要慎重。
+b) private
 
-#### public和private
-如果设置了public，表示该响应可以再浏览器或者任何中继的Web代理中缓存，public是默认值，
-即Cache-Control:max-age=60等同于Cache-Control:public, max-age=60。
+- 表示响应只能被浏览器私有缓存存储，不能被 CDN 等中间缓存存储
 
-在服务器设置了private比如Cache-Control:private, max-age=60的情况下，
-表示只有用户的浏览器可以缓存private响应，不允许任何中继Web代理对其进行缓存 
-例如，用户浏览器可以缓存包含用户私人信息的 HTML 网页，但是 CDN 不能缓存。
+c) no-cache
 
-#### no-cache
-如果服务器在响应中设置了no-cache即Cache-Control:no-cache，
-那么浏览器在使用缓存的资源之前，必须先与服务器确认返回的响应是否被更改，如果资源未被更改，可以避免下载。
-这个验证之前的响应是否被修改，就是通过上面介绍的请求头If-None-match和响应头ETag来实现的。
+- 强制客户端在使用缓存前必须先与服务器确认资源是否变化
+- 实际上是启用协商缓存
 
-需要注意的是，no-cache这个名字有一点误导。
-设置了no-cache之后，并不是说浏览器就不再缓存数据，只是浏览器在使用缓存数据时，需要先确认一下数据是否还跟服务器保持一致。
-如果设置了no-cache，而ETag的实现没有反应出资源的变化，那就会导致浏览器的缓存数据一直得不到更新的情况。
+d) no-store
 
-#### no-store
-如果服务器在响应中设置了no-store即Cache-Control:no-store，
-那么浏览器和任何中继的Web代理，都不会存储这次相应的数据。
-当下次请求该资源时，浏览器只能重新请求服务器，重新从服务器读取资源。
-### 协商缓存
-浏览器在请求资源之前，会先检查本地有没有缓存相应资源。如果缓存了，请求头中会带上：
-* If-Modified-Since：服务器上次返回的Last-Modified日期值
-* If-None-Match： 服务器上次返回的ETag日期 etag 由文件内容生成 相当于文件的hash值
+- 禁止所有缓存，每次都要重新请求
 
-一般来说 eTag的优先级要高于 last-Modified
+2. 过期
 
-服务器会读取到这两个请求头中的值,判断出客户端缓存的资源是否是最新的,如果是的话,服务器就会返回HTTP/304 Not Modified响应,但没有响应体.浏览器会读取本地缓存的文件。
+a) max-age=<seconds>
+使用示例：
 
-如果服务器认为客户端缓存的资源已经过期了,那么服务器就会返回HTTP/200 OK响应,响应体就是该资源当前最新的内容.客户端收到200响应后,就会用新的响应体覆盖掉旧的缓存资源。
+```javascript
+Cache-Control: max-age=3600, public
+Cache-Control: no-cache
+Cache-Control: private, max-age=600
+Cache-Control: no-store
+Cache-Control: public, max-age=31536000, immutable
+```
 
+注意事项：
 
-## 为何既有last-modified又有Etag
-考虑以下情况：
+1. 可以组合多个指令，用逗号分隔
+2. 某些指令可能会相互冲突，如同时使用 no-store 和 max-age
+3. 服务器和客户端都可以发送 Cache-Control 头
+4. 对于重要的安全内容，建议使用 no-store
+5. 合理使用缓存可以显著提高网站性能和用户体验
 
-* 一些文件也许会周期性的更改,但是他的内容并不改变(仅仅改变的修改时间),这个时候,我们并不希望客户端认为这个文件被修改了,而重新 get
-* 某些文件修改非常频繁,比如在秒以下的时间内进行修改(比方说 1s 内修改了 N 次),If-Modified-Since能检查到的粒度时 s 级的,这种修改无法判断(或者说 UNIX 记录 MTIME只能精确到秒) 某些服务器不能精确得到的文件的最后修改时间
+在实际应用中，应根据资源的特性和业务需求选择合适的 Cache-Control 指令组合。
 
-### 解决Get请求缓存
+### 2. 协商缓存（Negotiation Cache）
 
-1. html meta标签，到考虑到浏览器兼容性，一般不使用
-2. 带上时间戳
-3. post替代
-4. 后端设置cache-Control: 'max-age: 0'
+协商缓存是指客户端与服务器之间存在一个验证机制，通过对比资源的标识来判断是否使用缓存。
 
+特点：
 
+- 会发送请求到服务器
+- 服务器决定客户端是否可以使用缓存
+- 如果可以使用缓存，返回 304 Not Modified
 
+控制协商缓存的 HTTP 头部：
+
+a) Last-Modified / If-Modified-Since
+
+- Last-Modified：服务器在响应中添加，表示资源的最后修改时间
+- If-Modified-Since：客户端在后续请求中添加，值为上次收到的 Last-Modified
+
+b) ETag / If-None-Match（优先级高于 Last-Modified）
+
+- ETag：服务器在响应中添加，表示资源的唯一标识
+- If-None-Match：客户端在后续请求中添加，值为上次收到的 ETag
+
+### 3. 缓存的优先级
+
+强缓存 > 协商缓存
+
+### 4. 缓存流程
+
+1) 浏览器首先检查强缓存
+2) 如果强缓存生效，直接使用缓存
+3) 如果强缓存失效，发送请求到服务器，进行协商缓存
+4) 服务器根据请求头中的 If-Modified-Since 或 If-None-Match 进行判断
+5) 如果资源未修改，返回 304，客户端使用缓存
+6) 如果资源已修改，返回 200 和新的资源
+
+### 5. 使用场景
+
+- 强缓存：适用于不经常变化的静态资源（如 CSS、JS、图片等）
+- 协商缓存：适用于可能会变化但变化不频繁的资源
+
+### 6. 注意事项
+
+- 合理设置缓存策略，避免缓存时间过长导致用户无法及时获取更新
+- 对于频繁变化的资源，可以使用版本号或哈希值来管理缓存
+- 在开发环境中可能需要禁用缓存以方便调试
+
+通过合理使用强缓存和协商缓存，可以显著提高网页加载速度，减少服务器压力，提升用户体验。
