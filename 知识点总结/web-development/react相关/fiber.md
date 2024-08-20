@@ -87,3 +87,71 @@ function performUnitOfWork(fiber) {
 - 需要注意处理旧版生命周期方法的兼容性问题
 
 React Fiber 是一个复杂的主题，它深刻地改变了 React 的内部工作方式。理解 Fiber 有助于开发者更好地优化 React 应用，特别是在处理大规模、复杂的交互时。
+
+### fiber的具体属性
+
+Fiber 节点是 React 内部用来表示组件的数据结构，它包含了许多重要的属性。以下是 Fiber 节点的主要属性：
+
+1. 标识相关
+   - tag: 标识 Fiber 节点类型（如函数组件、类组件、原生元素等）
+   - key: 用于 Diff 算法的 key
+   - elementType: 元素类型（如 div、span、组件函数等）
+   - type: 与 elementType 类似，但可能会被修改（如 React.memo 包裹的组件）
+
+2. 结构相关
+   - return: 指向父 Fiber 节点
+   - child: 指向第一个子 Fiber 节点
+   - sibling: 指向下一个兄弟 Fiber 节点
+   - index: 在兄弟节点中的索引
+
+3. 状态相关
+   - pendingProps: 新的 props
+   - memoizedProps: 上一次渲染时的 props
+   - updateQueue: 状态更新队列
+   - memoizedState: 上一次渲染时的 state
+
+4. 副作用相关
+   - effectTag: 表示节点需要执行的副作用类型（如更新、删除、添加等）
+   - nextEffect: 指向下一个有副作用的 Fiber 节点
+   - firstEffect: 指向第一个有副作用的子 Fiber 节点
+   - lastEffect: 指向最后一个有副作用的子 Fiber 节点
+
+5. 替换相关
+   - alternate: 指向内存中的另一个 Fiber 节点（用于双缓冲）
+
+6. 调度相关
+   - lanes: 表示更新的优先级
+   - childLanes: 子树中更新的优先级
+
+7. 渲染输出
+   - stateNode: 保存对组件实例、DOM 节点等的引用
+
+8. 调试信息
+   - _debugID: 用于开发工具的调试 ID
+   - _debugSource: 源代码位置信息
+   - _debugOwner: 创建该 Fiber 的组件
+
+9. 工作进度
+   - progressedChild: 部分完成的新树
+   - progressedPrimaryChild: 主树上部分完成的新树
+
+10. 时间信息
+    - actualStartTime: 本次渲染开始时间
+    - actualDuration: 本次渲染的实际时间
+    - selfBaseDuration: 不包含子组件的渲染时间
+    - treeBaseDuration: 整个子树的渲染时间
+
+11. 上下文
+    - contextDependencies: 上下文依赖
+
+这些属性使 Fiber 能够：
+
+- 追踪组件树结构
+- 管理组件的状态和属性
+- 控制渲染过程和调度
+- 处理副作用
+- 支持时间分片和优先级调度
+- 实现增量渲染
+- 支持调试和性能分析
+
+理解这些属性有助于深入了解 React 的内部工作机制，特别是在需要调试复杂问题或优化性能时。但在日常开发中，我们通常不需要直接操作这些属性，而是通过 React 提供的 API 来间接使用它们。
