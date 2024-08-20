@@ -72,7 +72,7 @@ Person.prototype.setAge = function () {
 function Student(name, age, price) {
 	//调用了父类的构造函数
 	/**
-	 * 此时this指向谁还不确定
+	 * 定义时this指向谁还不确定
 	 * 但是在下方 new student时 就确定了this指向 new 创建的新对象
 	 * 此时 student 的一个实例 来调用 Person构造函数
 	 */
