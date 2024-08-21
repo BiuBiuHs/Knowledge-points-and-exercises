@@ -96,3 +96,111 @@ Plugin：
    - Plugin: 当需要在构建过程中执行更广泛的任务时
 
 理解 Loader 和 Plugin 的区别和各自的用途，有助于更好地配置和优化 Webpack 构建过程，从而提高开发效率和应用性能。
+
+## 一个简单的 Loader 和 Plugin 的实现例子。这些例子将展示它们的基本结构和工作原理
+
+1. Loader 示例: 将所有出现的 "Hello" 替换为 "你好"
+
+```javascript
+// hello-loader.js
+
+module.exports = function(source) {
+  // source 是文件的原始内容
+  const result = source.replace(/Hello/g, '你好');
+  
+  // 返回转换后的内容
+  return result;
+};
+```
+
+使用这个 Loader：
+
+```javascript
+// webpack.config.js
+
+module.exports = {
+  // ...其他配置
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: ['hello-loader']
+      }
+    ]
+  }
+};
+```
+
+2. Plugin 示例: 在构建结束后生成一个构建报告文件
+
+```javascript
+// BuildReportPlugin.js
+
+const fs = require('fs');
+const path = require('path');
+
+class BuildReportPlugin {
+  constructor(options) {
+    this.filename = options.filename || 'build-report.json';
+  }
+
+  apply(compiler) {
+    compiler.hooks.done.tap('BuildReportPlugin', (stats) => {
+      const report = {
+        hash: stats.hash,
+        version: stats.version,
+        time: stats.endTime - stats.startTime,
+        errors: stats.hasErrors(),
+        assets: stats.toJson().assets.map(asset => ({
+          name: asset.name,
+          size: asset.size
+        }))
+      };
+
+      const reportJson = JSON.stringify(report, null, 2);
+      const outputPath = path.join(compiler.outputPath, this.filename);
+
+      fs.writeFileSync(outputPath, reportJson);
+      console.log(`Build report saved to ${outputPath}`);
+    });
+  }
+}
+
+module.exports = BuildReportPlugin;
+```
+
+使用这个 Plugin：
+
+```javascript
+// webpack.config.js
+
+const BuildReportPlugin = require('./BuildReportPlugin');
+
+module.exports = {
+  // ...其他配置
+  plugins: [
+    new BuildReportPlugin({
+      filename: 'my-build-report.json'
+    })
+  ]
+};
+```
+
+解释：
+
+1. Loader 示例:
+   - 这个 Loader 接收文件内容作为输入。
+   - 它使用正则表达式将所有 "Hello" 替换为 "你好"。
+   - 最后返回修改后的内容。
+   - Webpack 会将这个 Loader 应用到所有 .js 文件。
+
+2. Plugin 示例:
+   - 这个 Plugin 在构建完成后生成一个报告文件。
+   - 它使用 compiler.hooks.done 钩子，这个钩子在构建完成时触发。
+   - Plugin 收集构建统计信息，如构建时间、哈希值、资源列表等。
+   - 然后将这些信息写入到一个 JSON 文件中。
+
+这些例子展示了 Loader 和 Plugin 的基本结构和用法：
+
+- Loader 主要关注单个文件的转换。
+- Plugin 可以访问整个构建过程，执行更复杂的任务。
