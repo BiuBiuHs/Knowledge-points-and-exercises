@@ -8,9 +8,12 @@
 
 function changes(coins, amount) {
 	const dp = new Array(amount + 1).fill(amount + 1)
+	dp[0] = 0
 	for (var i = 1; i <= amount; i++) {
+		//从1块钱开始计算
 		for (var coin of coins) {
 			if (coin <= i) {
+				//记录的是最少的硬币数量
 				dp[i] = Math.min(dp[i], dp[i - coin] + 1)
 			}
 		}

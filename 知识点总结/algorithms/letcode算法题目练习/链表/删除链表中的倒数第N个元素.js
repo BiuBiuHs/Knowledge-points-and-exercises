@@ -3,10 +3,9 @@
 
 // 进阶：你能尝试使用一趟扫描实现吗？
 
-//  
+//
 
 // 示例 1：
-
 
 // 输入：head = [1,2,3,4,5], n = 2
 // 输出：[1,2,3,5]
@@ -18,7 +17,7 @@
 
 // 输入：head = [1,2], n = 1
 // 输出：[1]
-//  
+//
 
 // 提示：
 
@@ -27,23 +26,22 @@
 // 0 <= Node.val <= 100
 // 1 <= n <= sz
 
-//添加一个伪节点 
-var removeNthFromEnd = function(head, n) {
-    let preHead = new ListNode(0) //伪节点 该节点指向头节点 
-    preHead.next = head
-    let fast = preHead, slow = preHead //设置快慢指针 
-    // 快先走 n+1 步
-    while(n--) {
-        fast = fast.next
-    }
-    // fast、slow 一起前进
-    while(fast && fast.next) {
-        fast = fast.next
-        slow = slow.next
-    }
-    slow.next = slow.next.next
-    return preHead.next
-};
-
-
-
+//添加一个伪节点
+var removeNthFromEnd = function (head, n) {
+	//生成一个假头
+	let dummyHead = new ListNode(0) //伪节点 该节点指向头节点
+	dummyHead.next = head
+	let fast = dummyHead,
+		slow = dummyHead //设置快慢指针
+	// 快先走 n+1 步
+	while (n--) {
+		fast = fast.next
+	}
+	// fast、slow 一起前进
+	while (fast && fast.next) {
+		fast = fast.next
+		slow = slow.next
+	}
+	slow.next = slow.next.next
+	return dummyHead.next
+}
