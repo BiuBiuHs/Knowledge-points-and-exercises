@@ -23,8 +23,8 @@
 // 字符串大小将在 [1，100] 范围内。
 
 /**
- * 
- * 解题思路 
+ *
+ * 解题思路
  * 1.遍历字符串s 使用两个数组 分别保存 左括号 与 星 的index
  * 2.当遍历到右括号时 优先匹配 最近的 （ ,如果左括号数组中没有 则匹配最近的 *  如果都没有值 则返回false
  * 3.遍历完成后 可能存在 左括号 与 星数组中仍然有值
@@ -36,25 +36,34 @@
 /**
  * @param {string} s
  * @return {boolean}
+ */ /**
+ * @param {string} s
+ * @return {boolean}
  */
- var checkValidString = function(s) {
+var checkValidString = function (s) {
+	let leftStack = []
+	let starStack = []
 
-    let left = [], star = [];
-        for(let i=0;i<s.length;i++){
-            if(s[i] == "(") left.push(i);
-            if(s[i] == "*") star.push(i);
-            if(s[i] == ")") {
-                if(left.length == 0){
-                    if(star.length == 0) return false;
-                    star.pop();
-                }else {
-                    left.pop();
-                }
-            }
-        }
-        if(left.length > star.length) return false;
-        while(left.length && star.length){
-            if(left.pop() > star.pop()) return false;
-        }
-        return true;
-    };
+	for (var i = 0; i < s.length; i++) {
+		if (s[i] == '(') {
+			leftStack.push(i)
+		} else if (s[i] == '*') {
+			starStack.push(i)
+		} else {
+			if (leftStack.length > 0) {
+				leftStack.pop()
+			} else if (starStack.length) {
+				starStack.pop()
+			} else {
+				return false
+			}
+		}
+	}
+	while (leftStack.length && starStack.length) {
+		if (leftStack[leftStack.length - 1] > starStack[starStack.length - 1])
+			return false
+		leftStack.pop()
+		starStack.pop()
+	}
+	return leftStack.length == 0
+}
