@@ -1,4 +1,3 @@
-
 // https://leetcode.cn/problems/reverse-nodes-in-k-group/
 // 给你链表的头节点 head ，每 k 个节点一组进行翻转，请你返回修改后的链表。
 
@@ -6,62 +5,70 @@
 
 // 你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。
 
- 
-
 // 示例 1：
-
 
 // 输入：head = [1,2,3,4,5], k = 2
 // 输出：[2,1,4,3,5]
 // 示例 2：
 
-
-
 // 输入：head = [1,2,3,4,5], k = 3
 // 输出：[3,2,1,4,5]
- 
 
 // 提示：
 // 链表中的节点数目为 n
 // 1 <= k <= n <= 5000
 // 0 <= Node.val <= 1000
 
-//题解需要使用链表翻转
-const myReverse = (head, tail) => {
-    let prev = tail.next;
-    let p = head;
-    while (prev !== tail) {
-        const nex = p.next;
-        p.next = prev;
-        prev = p;
-        p = nex;
-    }
-    return [tail, head];
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+
+/**
+ * @param {ListNode} head
+ * @param {number} k
+ * @return {ListNode}
+ */
+function reverseKGroup(head, k) {
+	if (!head || k === 1) return head
+
+	let dummy = new ListNode(0)
+	dummy.next = head
+	let prev = dummy
+
+	while (head) {
+		let tail = prev
+		// 检查剩余节点是否有k个
+		for (let i = 0; i < k; i++) {
+			tail = tail.next
+			if (!tail) return dummy.next
+		}
+
+		let next = tail.next
+		;[head, tail] = reverseList(head, tail)
+
+		// 连接翻转后的部分
+		prev.next = head
+		tail.next = next
+		prev = tail
+		head = tail.next
+	}
+
+	return dummy.next
 }
 
-
-var reverseKGroup = function(head, k) {
-    const hair = new ListNode(0);
-    hair.next = head;
-    let pre = hair;
-
-    while (head) {
-        let tail = pre;
-        // 查看剩余部分长度是否大于等于 k
-        for (let i = 0; i < k; ++i) {
-            tail = tail.next;
-            if (!tail) {
-                return hair.next;
-            }
-        }
-        const nex = tail.next;
-        //将制定长度的链表进行翻转
-        [head, tail] = myReverse(head, tail);
-        // 把子链表重新接回原链表
-        pre.next = head;
-        tail.next = nex;
-        pre = tail;
-        head = tail.next;
-    }
-    return hair.next;
-};
+// 翻转链表的辅助函数
+function reverseList(head, tail) {
+	let prev = tail.next
+	let p = head
+	while (prev !== tail) {
+		let next = p.next
+		p.next = prev
+		prev = p
+		p = next
+	}
+	return [tail, head]
+}
