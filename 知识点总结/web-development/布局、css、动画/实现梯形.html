@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+			/* 要用CSS实现等腰梯形，我们可以利用CSS的边框（border）属性和伪元素。以下是几种实现等腰梯形的方法：
+
+			1. 使用边框方法：
+
+			```css
+			.trapezoid {
+			  width: 200px;
+			  height: 0;
+			  border-bottom: 100px solid #007bff;
+			  border-left: 50px solid transparent;
+			  border-right: 50px solid transparent;
+			}
+			```
+      */
+			.trapezoid {
+				width: 200px;
+				height: 0;
+				border-bottom: 100px solid #007bff;
+				border-left: 50px solid transparent;
+				border-right: 50px solid transparent;
+			}
+
+			/* 这种方法通过设置底部边框为实线，左右边框为透明来创建梯形。
+
+			2. 使用伪元素和transform方法：
+
+			```css
+			.trapezoid {
+			  position: relative;
+			  width: 200px;
+			  height: 100px;
+			  background: #007bff;
+			}
+
+			.trapezoid::before,
+			.trapezoid::after {
+			  content: '';
+			  position: absolute;
+			  top: 0;
+			  width: 0;
+			  height: 0;
+			  border-top: 100px solid white;
+			}
+
+			.trapezoid::before {
+			  left: 0;
+			  border-right: 50px solid transparent;
+			}
+
+			.trapezoid::after {
+			  right: 0;
+			  border-left: 50px solid transparent;
+			}
+			```
+
+			这种方法通过在矩形两侧添加三角形来创建梯形效果。 */
+
+			/* 3. 使用clip-path方法（现代浏览器支持）：
+
+			```css
+			.trapezoid {
+			  width: 200px;
+			  height: 100px;
+			  background: #007bff;
+			  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+			}
+			```
+
+			这种方法使用`clip-path`属性直接定义梯形的形状。 */
+
+			/* 4. 使用transform方法：
+
+			```css
+			.trapezoid {
+			  width: 200px;
+			  height: 100px;
+			  background: #007bff;
+			  transform: perspective(10px) rotateX(1deg);
+			}
+			```
+
+			这种方法通过对矩形应用3D变换来创建梯形效果。
+
+			每种方法都有其优缺点：
+			- 边框方法简单，但不易控制梯形的高度。
+			- 伪元素方法灵活，但代码较多。
+			- clip-path方法简洁直观，但浏览器兼容性可能有问题。
+			- transform方法简单，但梯形的倾斜度不易精确控制。
+
+			选择哪种方法取决于你的具体需求和目标浏览器的支持情况。 */
+		</style>
+	</head>
+	<body>
+		<div class="trapezoid"></div>
+	</body>
+</html>

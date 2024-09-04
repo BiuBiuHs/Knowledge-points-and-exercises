@@ -1,14 +1,12 @@
 // 给定一个数组，数组中的元素代表木板的高度。请你求出相邻木板能剪出的最大矩形面积。
 
-
-
 /**
  * 思路：
  *
  * 在选择的时候，由于要构造出最大的矩形。一种暴力的做法是：
  *
  * for (int i = 0; i < N; i++) {
- *     ans = max(ans, A[i]参与构造的最大矩形面积);   
+ *     ans = max(ans, A[i]参与构造的最大矩形面积);
  * }
  *
  * 那么在求A[i]参与构造的最大矩形的时候。A[i]左边与右边的值
@@ -24,7 +22,7 @@
  *     rightPos = findRightSmall(A[i]);
  *     ans = max(ans, A[i] * (rightPos - leftPos - 1));
  * }
- * 
+ *
  * 而leftPos和rightPos我们都可以先通过单调栈得到。那么到这里，问题就解决了。
  *
  *
@@ -32,62 +30,55 @@
 
 //寻找左边第一个比当前小的元素
 const findLeftMinItem = function (arr) {
-    let stack =[]
-    let ans =[]
+	let stack = []
+	let ans = []
 
-    for(var i = arr.length -1;i >=0 ; i--){
+	for (var i = arr.length - 1; i >= 0; i--) {
+		let cur = arr[i]
+		while (stack.length && arr[stack[stack.length - 1]] > cur) {
+			const index = stack.pop()
+			ans[index] = i
+		}
+		stack.push(i)
+	}
 
-        let cur = arr[i]
-        while(stack.length && arr[stack[stack.length -1]] > cur){
-
-            const index = stack.pop()
-            ans[index] = i
-        
-        }
-        stack.push(i)
-    }
-
-    while(stack.length) {
-        const index = stack.pop()
-        ans[index] = -1
-
-    }
-    return ans
+	while (stack.length) {
+		const index = stack.pop()
+		ans[index] = -1
+	}
+	return ans
 }
-
 
 const findRightMinItem = function (arr) {
-    let stack =[]
-    let ans =[]
+	let stack = []
+	let ans = []
 
-    for(var i = 0;i <arr.length ; i--){
+	for (var i = 0; i < arr.length; i--) {
+		let cur = arr[i]
+		while (stack.length && arr[stack[stack.length - 1]] > cur) {
+			const index = stack.pop()
+			ans[index] = i
+		}
+		stack.push(i)
+	}
 
-        let cur = arr[i]
-        while(stack.length && arr[stack[stack.length -1]] > cur){
-            const index = stack.pop()
-            ans[index] = i
-        }
-        stack.push(i)
-    }
-
-    while(stack.length) {
-        const index = stack.pop()
-        ans[index] = -1
-
-    }
-    return ans
+	while (stack.length) {
+		const index = stack.pop()
+		ans[index] = -1
+	}
+	return ans
 }
 
-function maxArea (arr) {
-    if(!arr.length) return 0
-    let leftArr = findLeftMinItem(arr)
-    let rightArr = findRightMinItem(arr)
+function maxArea(arr) {
+	if (!arr.length) return 0
+	let leftArr = findLeftMinItem(arr)
+	let rightArr = findRightMinItem(arr)
 
-    let area = 0
-    for(var i =0; i < arr.length ; i++) {
-        const left = leftArr[i]
-        const  right = rightArr[i]
-        arer = Math.max(area,(right -left) * arr[i])
-    }
-    return area
+	let area = 0
+	for (var i = 0; i < arr.length; i++) {
+		const left = leftArr[i]
+		const right = rightArr[i]
+		area = Math.max(area, (right - left) * arr[i])
+	}
+	return area
 }
