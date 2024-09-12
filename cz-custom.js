@@ -21,6 +21,12 @@ module.exports = {
 						{ name: '🔧 Chore', value: 'chore' },
 						{ name: '↩ Revert', value: 'revert' },
 					],
+					validate: function (input) {
+						if (!input) {
+							return 'You must select a type'
+						}
+						return true
+					},
 				},
 				{
 					type: 'input',
@@ -31,6 +37,12 @@ module.exports = {
 					type: 'input',
 					name: 'subject',
 					message: 'Short description:',
+					validate: function (input) {
+						if (!input) {
+							return 'Short description cannot be empty'
+						}
+						return true
+					},
 				},
 				{
 					type: 'input',
