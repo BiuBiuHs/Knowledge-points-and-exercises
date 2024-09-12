@@ -1,0 +1,29 @@
+{
+	"name": "knowledge-points-and-exercises",
+	"version": "1.0.0",
+	"description": "主要总结面试时 可能会遇到的问题及解答。",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"commit": "git-cz"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/BiuBiuHs/Knowledge-points-and-exercises.git"
+	},
+	"author": "huangshuai",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/BiuBiuHs/Knowledge-points-and-exercises/issues"
+	},
+	"dependencies": {},
+	"homepage": "https://github.com/BiuBiuHs/Knowledge-points-and-exercises#readme",
+	"devDependencies": {
+		"cz-conventional-changelog": "^3.3.0"
+	},
+	"config": {
+		"commitizen": {
+			"path": "./cz-custom.js"
+		}
+	}
+}
