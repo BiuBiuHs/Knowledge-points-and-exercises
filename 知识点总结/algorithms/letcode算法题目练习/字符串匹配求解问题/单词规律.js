@@ -4,28 +4,20 @@
  * @return {boolean}
  */
 var wordPattern = function (pattern, s) {
-	const left = {}
-	const right = {}
-	let wordArr = s.split(' ')
-	console.log(1, wordArr)
-	if (pattern.length !== wordArr.length) return false
-	console.log(2)
+	const left = new Map();
+	const right = new Map();
+	let wordArr = s.split(" ");
+	if (pattern.length !== wordArr.length) return false;
 	for (var i = 0; i < pattern.length; i++) {
-		const x = pattern[i]
-		const y = wordArr[i]
-		console.log(x, y, 'x,y')
+		const x = pattern[i];
+		const y = wordArr[i];
 		if (
-			(left[x] !== undefined && left[x] !== y) ||
-			(right[y] !== undefined && right[y] !== x)
-		) {
-			console.log(3)
-			return false
-		}
-
-		left[x] = y
-		right[y] = x
+			(left.has(x) && left.get(x) !== y) ||
+			(right.has(y) && right.get(y) !== x)
+		)
+			return false;
+		left.set(x, y);
+		right.set(y, x);
 	}
-	return true
-}
-
-console.log(wordPattern('abba', 'dog cat cat dog'), 'result')
+	return true;
+};
