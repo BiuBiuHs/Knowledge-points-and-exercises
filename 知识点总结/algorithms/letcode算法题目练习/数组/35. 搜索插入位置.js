@@ -24,7 +24,6 @@
 // nums 为 无重复元素 的 升序 排列数组
 // -104 <= target <= 104
 
-console.log("test");
 /**
  * @param {number[]} nums
  * @param {number} target
