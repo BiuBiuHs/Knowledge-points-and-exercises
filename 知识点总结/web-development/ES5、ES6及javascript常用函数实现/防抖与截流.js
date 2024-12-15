@@ -18,6 +18,7 @@ function debounce(func, delay) {
 }
 
 // 示例使用
+console.log(1);
 const input = document.getElementById("input");
 input.addEventListener(
 	"input",
