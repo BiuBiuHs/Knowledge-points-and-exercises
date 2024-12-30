@@ -48,37 +48,27 @@ Function.prototype.myApply = function(context, argsArray) {
 
 ```javascript
 Function.prototype.myBind = function(context, ...args1) {
-  const originalFunc = this;
-
-  // 返回一个新函数
-  return function(...args2) {
-    // 合并参数
-    const allArgs = args1.concat(args2);
-    
-    // 使用 apply 来设置 this 并执行函数
-    return originalFunc.apply(context, allArgs);
-  };
-};
-```
-
-```javascript
-// 考虑 bind 后的函数 使用new操作符
-Function.prototype.bind2 = function (context) {
-
-    var self = this;
-    var args = Array.prototype.slice.call(arguments, 1);
-
-    var fNOP = function () {};
-
-    var fBound = function () {
-        var bindArgs = Array.prototype.slice.call(arguments);
-        return self.apply(this instanceof fNOP ? this : context, args.concat(bindArgs));
+    if (typeof this !== 'function') {
+        throw new TypeError('Bind must be called on a function');
     }
 
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
-    return fBound;
-}
+    const originalFunction = this;
+
+    return function(...args2) {
+//    if (this instanceof Function)  这行代码的工作原理如下：
+
+// 普通函数调用： 当函数被普通调用时（不使用 new），this 通常指向全局对象（在非严格模式下）或 undefined（在严格模式下）。在这种情况下，this instanceof Function 将返回 false。
+
+// 构造函数调用： 当函数被作为构造函数调用时（使用 new），JavaScript 会创建一个新对象，这个新对象的原型链上会包含 Function.prototype。因此，this instanceof Function 将返回 true。
+        // 如果这个函数被用作构造函数
+        if (this instanceof Function) {
+            return new originalFunction(...args1, ...args2);
+        }
+        
+        // 正常调用
+        return originalFunction.apply(context, args1.concat(args2));
+    };
+};
 
 ```
 

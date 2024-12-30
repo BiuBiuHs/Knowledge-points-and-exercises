@@ -1,11 +1,11 @@
 // 给定一个字符串 s ，请你找出其中不含有重复字符的 最长子串 的长度。
 
-//  
+//
 
 // 示例 1:
 
 // 输入: s = "abcabcbb"
-// 输出: 3 
+// 输出: 3
 // 解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
 // 示例 2:
 
@@ -22,19 +22,16 @@
 
 // 输入: s = ""
 // 输出: 0
-//  
+//
 
 // 提示：
 
 // 0 <= s.length <= 5 * 104
 // s 由英文字母、数字、符号和空格组成
 
-
 // 链接：https://leetcode-cn.com/problems/longest-substring-without-repeating-characters
 
-
 //使用滑动窗口 也就是双指针 只不过不是从头和尾部同时便利  都是从字符串的头开始遍历
-
 
 // 我们使用两个指针表示字符串中的某个子串（或窗口）的左右边界，其中左指针代表着上文中「枚举子串的起始位置」，而右指针即为上文中的 r_k
 
@@ -43,29 +40,28 @@
 
 // 在枚举结束后，我们找到的最长的子串的长度即为答案。
 
-
 /**
- * @param {string} s
+ * @param {string}
  * @return {number}
  */
-var lengthOfLongestSubstring = function(s) {
-    //使用map记录 每个字符最后出现的位置
-    const strMap = new Map()
-    //把left指向 相当于我们在字符串的左边界的左侧，还没有开始移动
-    let left = -1
-    let ans = 0
-    //遍历字符串
-    for(var i = 0; i < s.length ; i++) {
-        //当重复的字符在上一次的边界右侧后 更新左侧边界 
-        while(strMap.get(s[i]) > left) {
-            left = strMap.get(s[i])
-        }
-        //更新字符的下标
-        strMap.set(s[i],i)
-        //贪心取到最大值 
-        //区间为 i 到left 的差值
-        //区间为左开右闭区间 
-        ans = Math.max(ans,i - left)
-    }
-    return ans 
-};
+var lengthOfLongestSubstring = function (s) {
+	//使用map记录 每个字符最后出现的位置
+	const strMap = new Map()
+	//把left指向 相当于我们在字符串的左边界的左侧，还没有开始移动
+	let left = -1
+	let ans = 0
+	//遍历字符串
+	for (var i = 0; i < s.length; i++) {
+		//当重复的字符在上一次的边界右侧后 更新左侧边界
+		while (strMap.get(s[i]) > left) {
+			left = strMap.get(s[i])
+		}
+		//更新字符的下标
+		strMap.set(s[i], i)
+		//贪心取到最大值
+		//区间为 i 到left 的差值
+		//区间为左开右闭区间
+		ans = Math.max(ans, i - left)
+	}
+	return ans
+}
