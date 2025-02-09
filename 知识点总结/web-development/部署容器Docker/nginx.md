@@ -1,6 +1,6 @@
 以下是针对上述提到的几个 Nginx 功能的基本配置方法：
 
-## 静态文件服务：在 Nginx 的配置文件中，可以使用 location 指令来定义静态文件的路径。例如：
+## 静态文件服务：在 Nginx 的配置文件中，可以使用 location 指令来定义静态文件的路径。例如
 
 ```
 
@@ -9,7 +9,7 @@ root /usr/share/nginx/html;
 }
 ```
 
-## 反向代理：使用 proxy_pass 指令来设置反向代理。例如：
+## 反向代理：使用 proxy_pass 指令来设置反向代理。例如
 
 ```
 location / {
@@ -17,7 +17,7 @@ proxy_pass http://backend;
 }
 ```
 
-## 负载均衡：使用 upstream 指令来定义后端服务器群组，并在 proxy_pass 指令中使用。例如：
+## 负载均衡：使用 upstream 指令来定义后端服务器群组，并在 proxy_pass 指令中使用。例如
 
 ```
 此处相当于定义了一个变量 backend
@@ -32,7 +32,7 @@ proxy_pass http://backend;
 }
 ```
 
-## HTTPS：使用 ssl 指令和 ssl_certificate、ssl_certificate_key 指令来启用 HTTPS 并设置证书。例如：
+## HTTPS：使用 ssl 指令和 ssl_certificate、ssl_certificate_key 指令来启用 HTTPS 并设置证书。例如
 
 ```
 server {
@@ -47,7 +47,7 @@ ssl_certificate_key /etc/nginx/ssl/nginx.key;
 }
 ```
 
-## URL 重写和路由：使用 rewrite 指令来重写 URL。例如：
+## URL 重写和路由：使用 rewrite 指令来重写 URL。例如
 
 ```
 location / {
@@ -55,7 +55,7 @@ rewrite ^/user/(.\*)$ /profile?user=$1;
 }
 ```
 
-## 缓存和 Gzip 压缩：使用 gzip 指令来启用 Gzip 压缩，使用 proxy_cache 指令来启用代理缓存。例如：
+## 缓存和 Gzip 压缩：使用 gzip 指令来启用 Gzip 压缩，使用 proxy_cache 指令来启用代理缓存。例如
 
 ```
 gzip on;
@@ -67,7 +67,7 @@ proxy_pass http://backend;
 }
 ```
 
-## 跨域问题：使用 add_header 指令来添加 CORS 相关的 HTTP 头。例如：
+## 跨域问题：使用 add_header 指令来添加 CORS 相关的 HTTP 头。例如
 
 ```
 location / {
@@ -76,11 +76,11 @@ proxy_pass http://backend;
 }
 ```
 
-## 在 Nginx 中，location 指令用于定义如何处理特定类型的请求。location 可以根据请求的 URL 来匹配，并根据匹配结果执行不同的操作。
+## 在 Nginx 中，location 指令用于定义如何处理特定类型的请求。location 可以根据请求的 URL 来匹配，并根据匹配结果执行不同的操作
 
 以下是一些基本的 location 配置示例：
 
-## 为所有请求提供静态文件服务：
+## 为所有请求提供静态文件服务
 
 ```
 location / {
@@ -90,7 +90,7 @@ root /usr/share/nginx/html;
 
 上述配置表示，对于所有的请求（URL 路径以/开始），Nginx 都会在/usr/share/nginx/html 目录下寻找对应的静态文件来响应请求。
 
-## 只为特定路径提供静态文件服务：
+## 只为特定路径提供静态文件服务
 
 ```
 location /images/ {
@@ -100,7 +100,7 @@ root /usr/share/nginx;
 上述配置表示，只有当请求的 URL 路径以/images/开始时，Nginx 才会在/usr/share/nginx/images 目录下寻找对应的静态文件来响应请求。
 ```
 
-## 为特定路径设置反向代理：
+## 为特定路径设置反向代理
 
 ```
 location /api/ {
