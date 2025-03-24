@@ -87,7 +87,7 @@
 >> 彼此不依赖，其中任何一个被 reject ，对其它都没有影响
 >> 期望知道每个 promise 的执行结果
 
-```
+``` javascript
 
 function allSettled(promises) {
   if (promises.length === 0) return Promise.resolve([])
