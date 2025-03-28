@@ -1,26 +1,5 @@
 ### promise.all 实现
 
-#### 1.0 简单实现
->>
->> 彼此相互依赖，其中任何一个被 reject ，其它都失去了实际价值
-
-```javascript
-    Promise.all = function(promises) {
-    let results = [];
-    return new Promise(function(resolve) {
-        promises.forEach(function(val) {
-        // 按顺序执行每一个Promise操作
-        val.then(function(res) {
-            results.push(res);
-        });
-        });
-        resolve(results);
-    });
-    }
-```
-
-#### 1.0 版本存在的问题
-
 * 一、Promise.all传递的参数可能不是Promise类型，可能不存在then方法。
 * 二、如果中间发生错误，应该直接返回错误，不执行后面操作。
 
@@ -133,7 +112,7 @@ function allSettled(promises) {
 
 promiseAllsetteld 简写
 
-```
+``` javascript
   MyPromise.allSettled = function(values) {
     let promises = [].slice.call(values)
     return new MyPromise((resolve, reject) => {
