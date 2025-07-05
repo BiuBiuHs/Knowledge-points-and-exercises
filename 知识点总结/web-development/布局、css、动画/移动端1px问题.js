@@ -3,81 +3,91 @@
 // 那么为什么会产生这个问题呢？主要是跟一个东西有关，DPR(devicePixelRatio) 设备像素比，
 // 它是默认缩放为100%的情况下，设备像素和CSS像素的比值。
 // window.devicePixelRatio=物理像素 /CSS像素
-// 复制代码目前主流的屏幕DPR=2 （iPhone 8）,或者3 （iPhone 8 Plus）。拿2倍屏来说，设备的物理像素要实现1像素，
-// 而DPR=2，所以css 像素只能是 0.5。
-
-//使用伪元素
-
-// .setOnePx{
-//     position: relative;
-//     &::after{
-//       position: absolute;
-//       content: '';
-//       background-color: #e5e5e5;
-//       display: block;
-//       width: 100%;
-//       height: 1px; /*no*/
-//       transform: scale(1, 0.5);
-//       top: 0;
-//       left: 0;
-//     }
-//   }
-  
+// 复制代码目前主流的屏幕DPR=2 （iPhone 8）,或者3 （iPhone 8 Plus）。
+// 也就是说在 dpi =2 的设备上 1 css像素 对应的是2 *2 的像素点 比看起来更宽
 
 // 设置viewpoint
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>1px Line Example</title>
+  <style>
 
-// <html>
-//   <head>
-//       <title>1px question</title>
-//       <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-//       <meta name="viewport" id="WebViewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">        
-//       <style>
-//           html {
-//               font-size: 1px;
-//           }            
-//           * {
-//               padding: 0;
-//               margin: 0;
-//           }
-//           .top_b {
-//               border-bottom: 1px solid #E5E5E5;
-//           }
 
-//           .a,.b {
-//                       box-sizing: border-box;
-//               margin-top: 1rem;
-//               padding: 1rem;                
-//               font-size: 1.4rem;
-//           }
+// 为什么默认设置为 16px
+// 兼容性：大多数浏览器的默认字体大小是 16px，这样设置可以确保在没有特殊样式的情况下，文本的显示效果一致。
+// 简单：16px 是一个方便的基准值，因为 1rem 等于 16px，可以直接使用 rem 单位进行布局，而不需要复杂的换算。
+    html {
+      font-size: 16px; /* 默认字体大小 */
+    }
+    .line {
+      border: 0.05rem solid black; /* 1px 线条 */
+    }
+  </style>
+</head>
+<body>
+  <div class="line"></div>
+  <script>
+    function setRemUnit() {
+      const html = document.documentElement;
+      const width = html.clientWidth;
+      //设置为十分之一 是为了方便计算的策略
+      const rem = width / 10; // 根据屏幕宽度动态设置根元素的字体大小
+      html.style.fontSize = rem + 'px';
+    }
 
-//           .a {
-//               width: 100%;
-//           }
+    // 初始化设置
+    setRemUnit();
 
-//           .b {
-//               background: #f5f5f5;
-//               width: 100%;
+    // 监听窗口大小变化
+    window.addEventListener('resize', setRemUnit);
+  </script>
+</body>
+</html>
+
+```;
+
+// 配合webpack 的插件实现自动px转换为rem
+
+// const path = require('path');
+
+// module.exports = {
+//   entry: './src/index.js',
+//   output: {
+//     filename: 'bundle.js',
+//     path: path.resolve(__dirname, 'dist')
+//   },
+//   module: {
+//     rules: [
+//       {
+//         test: /\.css$/,
+//         use: [
+//           'style-loader',
+//           'css-loader',
+//           {
+//             loader: 'postcss-loader',
+//             options: {
+//               postcssOptions: {
+//                 plugins: [
+//                   'postcss-preset-env',
+//                   [
+//                     'postcss-pxtorem',
+//                     {
+//                       rootValue: 16, // 根元素的字体大小
+//                       propList: ['*'], // 需要转换的属性
+//                       selectorBlackList: ['.ignore'], // 忽略的类名
+//                       minPixelValue: 1 // 最小转换值
+//                     }
+//                   ]
+//                 ]
+//               }
+//             }
 //           }
-//       </style>
-//       <script>
-//           var viewport = document.querySelector("meta[name=viewport]");
-//           //下面是根据设备像素设置viewport
-//           if (window.devicePixelRatio == 1) {
-//               viewport.setAttribute('content', 'width=device-width,initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no');
-//           }
-//           if (window.devicePixelRatio == 2) {
-//               viewport.setAttribute('content', 'width=device-width,initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no');
-//           }
-//           if (window.devicePixelRatio == 3) {
-//               viewport.setAttribute('content', 'width=device-width,initial-scale=0.3333333333333333, maximum-scale=0.3333333333333333, minimum-scale=0.3333333333333333, user-scalable=no');
-//           }
-//           var docEl = document.documentElement;
-//           var fontsize = 32* (docEl.clientWidth / 750) + 'px';
-//           docEl.style.fontSize = fontsize;
-//       </script>
-//   </head>
-//   <body>
-//       <div class="top_b a">下面的底边宽度是虚拟1像素的</div>
-//       <div class="b">上面的边框宽度是虚拟1像素的</div>
-//   </body>
-// </html>
+//         ]
+//       }
+//     ]
+//   }
+// };
