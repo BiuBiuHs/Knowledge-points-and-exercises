@@ -44,33 +44,53 @@ Function.prototype.myApply = function(context, argsArray) {
 };
 ```
 
-3. bind 的实现：
+### 实现 `bind` 函数
 
 ```javascript
-Function.prototype.myBind = function(context, ...args1) {
-    if (typeof this !== 'function') {
-        throw new TypeError('Bind must be called on a function');
+Function.prototype.myBind = function (context, ...args1) {
+  if (typeof this !== 'function') {
+    throw new TypeError('myBind can only be called on functions');
+  }
+
+  const fn = this;
+
+  return function boundFn(...args2) {
+    // 合并参数
+    const combinedArgs = args1.concat(args2);
+
+    // 如果调用时 new 操作符创建了实例，则 this 应该是新创建的实例
+    if (this instanceof boundFn) {
+      return new fn(...combinedArgs);
     }
 
-    const originalFunction = this;
-
-    return function(...args2) {
-//    if (this instanceof Function)  这行代码的工作原理如下：
-
-// 普通函数调用： 当函数被普通调用时（不使用 new），this 通常指向全局对象（在非严格模式下）或 undefined（在严格模式下）。在这种情况下，this instanceof Function 将返回 false。
-
-// 构造函数调用： 当函数被作为构造函数调用时（使用 new），JavaScript 会创建一个新对象，这个新对象的原型链上会包含 Function.prototype。因此，this instanceof Function 将返回 true。
-        // 如果这个函数被用作构造函数
-        if (this instanceof Function) {
-            return new originalFunction(...args1, ...args2);
-        }
-        
-        // 正常调用
-        return originalFunction.apply(context, args1.concat(args2));
-    };
+    // 否则，使用提供的 context
+    return fn.apply(context, combinedArgs);
+  };
 };
-
 ```
+
+### 解释
+
+1. **检查调用者**：
+   - `if (typeof this !== 'function')`：确保 `myBind` 是在一个函数上调用的，如果不是，抛出一个类型错误。
+
+2. **保存原始函数**：
+   - `const fn = this`：将当前函数保存到 `fn` 变量中，以便在返回的函数中使用。
+
+3. **返回新函数**：
+   - `return function boundFn(...args2)`：返回一个新函数 `boundFn`，该函数接受任意数量的参数 `args2`。
+
+4. **合并参数**：
+   - `const combinedArgs = args1.concat(args2)`：将 `bind` 时提供的参数 `args1` 和调用时提供的参数 `args2` 合并。
+
+5. **处理 `new` 调用**：
+
+   - `if (this instanceof boundFn)`：检查 `boundFn` 是否通过 `new` 调用。如果是，则使用 `new` 创建一个新实例，并调用原始函数 `fn`。
+   也就是说 此时 的this 就指向了 通过调用 new boundFn() 而创造出来的一个新对象 那么此时这个新对象的原型链上 就有 boundFn 所以此时返回了true ，因为instanceof 就是通过原型链去寻找 是否是某个函数的实例
+   - `return new fn(...combinedArgs)`：使用 `new` 创建一个新实例，并传递合并后的参数。
+
+6. **普通调用**：
+   - `return fn.apply(context, combinedArgs)`：使用 `apply` 调用原始函数 `fn`，并设置 `this` 上下文为 `context`，传递合并后的参数。
 
 这些实现的关键点：
 
