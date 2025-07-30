@@ -43,7 +43,7 @@ var maximumUniqueSubarray = function (nums) {
 		// 将当前元素加入当前子数组的和中
 		pSum += nums[i];
 
-		// 如果当前元素已经在 seen 中，移动左指针 j，直到当前元素不在 seen 中
+		// 如果当前元素已经在 seen 中，移动左指针 j，直到当前元素不在 窗口seen 中
 		while (seen.has(nums[i])) {
 			seen.delete(nums[j]);
 			pSum -= nums[j];
