@@ -10,6 +10,9 @@ var lengthOfLongestSubstring = function (s) {
 
 	for (var i = 0; i < s.length; i++) {
 		// 检查当前字符是否在之前出现过，并更新左边界
+
+		// strMap.get(s[i]) 会返回当前字符 s[i] 在 Map 中的值。如果 s[i] 不存在于 Map 中，get 方法会返回 undefined。
+		// 由于 undefined 在与数字比较时会被转换为 NaN，而 NaN 与任何数比较都会返回 false，
 		if (strMap.get(s[i]) > left) {
 			left = strMap.get(s[i]);
 		}

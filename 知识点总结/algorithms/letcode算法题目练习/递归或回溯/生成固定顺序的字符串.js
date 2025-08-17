@@ -7,24 +7,24 @@
 // 返回的类名序列需要满足: 先短后长，相同长度按照字母排序（小写字母优先）
 // 同时提供一个reset函数
 
-getUniqueClassName()
+getUniqueClassName();
 // 'a'
 
-getUniqueClassName()
+getUniqueClassName();
 // 'b'
 
-getUniqueClassName()
+getUniqueClassName();
 // 'c'
 
 // skip cases till 'Y'
 
-getUniqueClassName()
+getUniqueClassName();
 // 'Z'
 
-getUniqueClassName()
+getUniqueClassName();
 // 'aa'
 
-getUniqueClassName()
+getUniqueClassName();
 // 'aaa'
 
 // ...等等
@@ -33,24 +33,27 @@ getUniqueClassName()
  * @returns {string}
  */
 
-const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-let id = 52
+const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+var id = 52;
 function getUniqueClassName() {
 	// your code here
-	let className = ''
-	let num = id++
+	let className = "";
+	//这里 num的值是52 然后id +1 为53
+	let num = id++;
 	//要注意这里的 符号不能是 >= 否则会直接输出aa
 	while (num > 0) {
 		//取余相当于 生成字符串的后面的字符 即倒序生成 需要将之前生成的className拼接在后方 。
-		className = chars[num % chars.length] + className
+		className = chars[num % chars.length] + className;
 		//num 相当于需要遍历的次数 是整数倍就会生成 整数倍为 位数 字符串
-		num = Math.floor(num / chars.length) - 1
+		num = Math.floor(num / chars.length) - 1;
 		//3倍 > aaa 2倍=》 aa
 	}
-	return className
+	return className;
 }
 
 getUniqueClassName.reset = function () {
 	// your code here
-	id = 0
-}
+	id = 0;
+};
+
+console.log(getUniqueClassName());
