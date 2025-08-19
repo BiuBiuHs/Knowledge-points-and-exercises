@@ -131,11 +131,13 @@ myPromiseAllSettled(promises)
 
 ```javascript
     Promise.prototype.finally = function (callback) {
-        return this.then((value) => {
+        return this.then(
+          (value) => {
             return Promise.resolve(callback()).then(() => {
                 return value;
             });
-        }, (err) => {
+        },
+         (err) => {
             return Promise.resolve(callback()).then(() => {
                 throw err;
             });
