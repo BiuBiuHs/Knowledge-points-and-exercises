@@ -16,7 +16,9 @@
 	"bugs": {
 		"url": "https://github.com/BiuBiuHs/Knowledge-points-and-exercises/issues"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"ws": "^8.18.3"
+	},
 	"homepage": "https://github.com/BiuBiuHs/Knowledge-points-and-exercises#readme",
 	"devDependencies": {
 		"cz-conventional-changelog": "^3.3.0"
