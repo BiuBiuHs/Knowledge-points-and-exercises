@@ -26,26 +26,26 @@
  */
 function subarraySum(nums, k) {
 	// 初始化计数器和前缀和
-	let count = 0
-	let sum = 0
+	let count = 0;
+	let sum = 0;
 
 	// 使用 Map 存储前缀和及其出现次数
-	const map = new Map()
-	map.set(0, 1) // 初始化，前缀和为0出现1次
+	const map = new Map();
+	map.set(0, 1); // 初始化，前缀和为0出现1次
 
 	// 遍历数组
 	for (let num of nums) {
 		// 计算当前的前缀和
-		sum += num
+		sum += num;
 
 		// 如果 map 中存在 sum - k，说明找到了和为 k 的连续子数组
 		if (map.has(sum - k)) {
-			count += map.get(sum - k)
+			count += map.get(sum - k);
 		}
 
 		// 更新 map
-		map.set(sum, (map.get(sum) || 0) + 1)
+		map.set(sum, (map.get(sum) || 0) + 1);
 	}
 
-	return count
+	return count;
 }
