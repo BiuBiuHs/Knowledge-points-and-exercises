@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JSONP 跨域示例</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				margin: 20px;
+			}
+			button {
+				padding: 10px 20px;
+				margin: 10px 0;
+				font-size: 16px;
+			}
+			#result {
+				background: #f5f5f5;
+				padding: 15px;
+				border-radius: 5px;
+				margin-top: 20px;
+			}
+			.error {
+				color: red;
+			}
+			.success {
+				color: green;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>JSONP 跨域示例</h1>
+		<p>点击按钮测试 JSONP 跨域请求（确保服务端已启动在 3100 端口）</p>
+
+		<button id="btn-jsonp">发送 JSONP 请求</button>
+		<button id="btn-clear">清空结果</button>
+
+		<div id="result"></div>
+
+		<script>
+			// JSONP 实现函数
+			function jsonp(url, options = {}) {
+				const { callbackParam = "callback", timeout = 5000 } = options;
+
+				return new Promise((resolve, reject) => {
+					// 生成唯一的回调函数名
+					const callbackName =
+						"jsonp_cb_" +
+						Date.now() +
+						"_" +
+						Math.random().toString(16).slice(2);
+					console.log(callbackName, "callbackName");
+
+					// 创建 script 标签
+					const script = document.createElement("script");
+
+					// 设置超时
+					const timer = setTimeout(() => {
+						cleanup();
+						reject(new Error("JSONP 请求超时"));
+					}, timeout);
+
+					// 清理函数
+					function cleanup() {
+						clearTimeout(timer);
+						delete window[callbackName];
+						if (script.parentNode) {
+							script.parentNode.removeChild(script);
+						}
+					}
+
+					// 定义全局回调函数
+					window[callbackName] = (data) => {
+						cleanup();
+						resolve(data);
+					};
+
+					// 构建请求 URL
+					const separator = url.includes("?") ? "&" : "?";
+					script.src =
+						url +
+						separator +
+						encodeURIComponent(callbackParam) +
+						"=" +
+						encodeURIComponent(callbackName);
+
+					// 处理加载错误
+					script.onerror = () => {
+						cleanup();
+						reject(new Error("JSONP 请求失败"));
+					};
+
+					// 添加到 DOM
+					document.head.appendChild(script);
+				});
+			}
+
+			// 显示结果
+			function showResult(content, isError = false) {
+				const resultDiv = document.getElementById("result");
+				resultDiv.innerHTML = `<div class="${
+					isError ? "error" : "success"
+				}">${content}</div>`;
+			}
+
+			// 绑定事件
+			document
+				.getElementById("btn-jsonp")
+				.addEventListener("click", async () => {
+					try {
+						showResult("正在发送 JSONP 请求...");
+
+						const data = await jsonp("http://127.0.0.1:3100/api/user?uid=123", {
+							callbackParam: "callback",
+							timeout: 8000,
+						});
+
+						showResult(`
+          <h3>JSONP 请求成功！</h3>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `);
+					} catch (error) {
+						showResult(
+							`
+          <h3>JSONP 请求失败</h3>
+          <p>错误信息: ${error.message}</p>
+          <p>请确保:</p>
+          <ul>
+            <li>服务端已启动在 3100 端口</li>
+            <li>网络连接正常</li>
+          </ul>
+        `,
+							true
+						);
+					}
+				});
+
+			document.getElementById("btn-clear").addEventListener("click", () => {
+				document.getElementById("result").innerHTML = "";
+			});
+
+			// 页面加载完成提示
+			window.addEventListener("load", () => {
+				showResult("页面加载完成，可以开始测试 JSONP 请求");
+			});
+		</script>
+	</body>
+</html>

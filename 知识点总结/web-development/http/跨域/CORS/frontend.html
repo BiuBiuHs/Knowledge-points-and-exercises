@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CORS 跨域示例</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    button { padding: 10px 20px; margin: 10px 5px; font-size: 16px; }
+    #result { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 20px; }
+    .error { color: red; }
+    .success { color: green; }
+    .input-group { margin: 10px 0; }
+    input[type="text"] { padding: 8px; width: 200px; margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h1>CORS 跨域示例</h1>
+  <p>点击按钮测试 CORS 跨域请求（确保服务端已启动在 3200 端口）</p>
+  
+  <div class="input-group">
+    <label>POST 请求消息:</label>
+    <input type="text" id="message-input" value="Hello CORS!" placeholder="输入要发送的消息" />
+  </div>
+  
+  <button id="btn-get">发送 GET 请求</button>
+  <button id="btn-post">发送 POST 请求</button>
+  <button id="btn-clear">清空结果</button>
+  
+  <div id="result"></div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:3200';
+
+    // 通用请求函数
+    async function makeRequest(method, path, body = null) {
+      const options = {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      };
+
+      if (body) {
+        options.body = JSON.stringify(body);
+      }
+
+      const response = await fetch(API_BASE + path, options);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await response.json();
+      } else {
+        return await response.text();
+      }
+    }
+
+    // 显示结果
+    function showResult(content, isError = false) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `<div class="${isError ? 'error' : 'success'}">${content}</div>`;
+    }
+
+    // GET 请求
+    document.getElementById('btn-get').addEventListener('click', async () => {
+      try {
+        showResult('正在发送 GET 请求...');
+        
+        const data = await makeRequest('GET', '/api/info');
+        
+        showResult(`
+          <h3>GET 请求成功！</h3>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `);
+        
+      } catch (error) {
+        showResult(`
+          <h3>GET 请求失败</h3>
+          <p>错误信息: ${error.message}</p>
+          <p>请确保:</p>
+          <ul>
+            <li>服务端已启动在 3200 端口</li>
+            <li>网络连接正常</li>
+            <li>服务端已正确配置 CORS 头</li>
+          </ul>
+        `, true);
+      }
+    });
+
+    // POST 请求
+    document.getElementById('btn-post').addEventListener('click', async () => {
+      try {
+        const message = document.getElementById('message-input').value.trim();
+        if (!message) {
+          showResult('请输入要发送的消息', true);
+          return;
+        }
+
+        showResult('正在发送 POST 请求...');
+        
+        const data = await makeRequest('POST', '/api/echo', { 
+          message: message,
+          timestamp: Date.now()
+        });
+        
+        showResult(`
+          <h3>POST 请求成功！</h3>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `);
+        
+      } catch (error) {
+        showResult(`
+          <h3>POST 请求失败</h3>
+          <p>错误信息: ${error.message}</p>
+          <p>请确保:</p>
+          <ul>
+            <li>服务端已启动在 3200 端口</li>
+            <li>网络连接正常</li>
+            <li>服务端已正确配置 CORS 头</li>
+          </ul>
+        `, true);
+      }
+    });
+
+    // 清空结果
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      document.getElementById('result').innerHTML = '';
+    });
+
+    // 页面加载完成提示
+    window.addEventListener('load', () => {
+      showResult('页面加载完成，可以开始测试 CORS 请求');
+    });
+
+    // 演示如何检查浏览器对 CORS 的支持
+    if (typeof fetch === 'undefined') {
+      showResult('当前浏览器不支持 fetch API，请使用现代浏览器', true);
+    }
+  </script>
+</body>
+</html>
+
