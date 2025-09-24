@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+
+		<script>
+			// 1) 依赖收集容器：target -> key -> Set<effect>
+			const targetMap = new WeakMap();
+			let activeEffect = null;
+
+			function effect(fn, options = {}) {
+				const runner = () => {
+					try {
+						activeEffect = runner;
+						return fn();
+					} finally {
+						activeEffect = null;
+					}
+				};
+				runner.scheduler = options.scheduler;
+				runner();
+				return runner;
+			}
+
+			function track(target, key) {
+				if (!activeEffect) return;
+				let depsMap = targetMap.get(target);
+				if (!depsMap) targetMap.set(target, (depsMap = new Map()));
+				let dep = depsMap.get(key);
+				if (!dep) depsMap.set(key, (dep = new Set()));
+				dep.add(activeEffect);
+			}
+
+			function trigger(target, key) {
+				const depsMap = targetMap.get(target);
+				if (!depsMap) return;
+				const effects = depsMap.get(key);
+				if (!effects) return;
+				effects.forEach((eff) => {
+					if (eff.scheduler) eff.scheduler(eff);
+					else eff();
+				});
+			}
+
+			function reactive(obj) {
+				return new Proxy(obj, {
+					get(target, key, receiver) {
+						const res = Reflect.get(target, key, receiver);
+						track(target, key);
+						return res;
+					},
+					set(target, key, value, receiver) {
+						const old = target[key];
+						const ok = Reflect.set(target, key, value, receiver);
+						if (ok && old !== value) trigger(target, key);
+						return ok;
+					},
+				});
+			}
+
+			// 2) 简易调度：批量刷新，避免频繁多次重绘
+			const jobQueue = new Set();
+			let flushing = false;
+			function queueJob(job) {
+				jobQueue.add(job);
+				if (flushing) return;
+				flushing = true;
+				Promise.resolve().then(() => {
+					jobQueue.forEach((j) => j());
+					jobQueue.clear();
+					flushing = false;
+				});
+			}
+
+			// 3) 编译模板：支持 {{}} 文本插值、data-model、data-on-click
+			function compile(root, state, methods) {
+				const walk = (node) => {
+					// 文本节点：处理 {{ key }}
+					if (node.nodeType === 3) {
+						const original = node.textContent;
+						if (/\{\{([^}]+)\}\}/.test(original)) {
+							const render = () => {
+								node.textContent = original.replace(
+									/\{\{([^}]+)\}\}/g,
+									(_, expr) => {
+										const key = expr.trim();
+										return state[key];
+									}
+								);
+							};
+							effect(render, { scheduler: (job) => queueJob(job) });
+						}
+						return;
+					}
+
+					// 元素节点：处理 data-model 和 data-on-click
+					if (node.nodeType === 1) {
+						const el = node;
+						const modelKey = el.getAttribute && el.getAttribute("data-model");
+						if (modelKey) {
+							// state -> view
+							effect(
+								() => {
+									if (el.type === "checkbox") {
+										el.checked = Boolean(state[modelKey]);
+									} else if (el.type === "radio") {
+										el.checked = el.value === state[modelKey];
+									} else {
+										el.value = state[modelKey] ?? "";
+									}
+								},
+								{ scheduler: (job) => queueJob(job) }
+							);
+
+							// view -> state
+							el.addEventListener("input", () => {
+								const v = el.type === "checkbox" ? el.checked : el.value;
+								state[modelKey] = v;
+							});
+						}
+
+						const onClick = el.getAttribute && el.getAttribute("data-on-click");
+						if (onClick && methods && typeof methods[onClick] === "function") {
+							el.addEventListener("click", () => methods[onClick].call(state));
+						}
+
+						Array.from(el.childNodes).forEach(walk);
+					}
+				};
+				walk(root);
+			}
+
+			// 4) 挂载：初始化状态与方法，并编译 #app
+			function mount() {
+				const state = reactive({
+					title: "Proxy 实现的迷你 MVVM",
+					count: 0,
+					message: "你好，MVVM！",
+				});
+
+				const methods = {
+					increment() {
+						this.count++;
+					},
+					decrement() {
+						if (this.count > 0) this.count--;
+					},
+					clearMessage() {
+						this.message = "";
+					},
+				};
+
+				const app = document.querySelector("#app");
+				compile(app, state, methods);
+			}
+
+			document.addEventListener("DOMContentLoaded", mount);
+		</script>
+	</head>
+	<body>
+		<div id="app">
+			<h2>{{ title }}</h2>
+			<div>
+				<button data-on-click="decrement">-1</button>
+				<span style="margin: 0 8px">计数：{{ count }}</span>
+				<button data-on-click="increment">+1</button>
+			</div>
+			<div style="margin-top: 12px">
+				<input type="text" data-model="message" placeholder="编辑消息" />
+				<button data-on-click="clearMessage">清空</button>
+				<p>消息：{{ message }}</p>
+			</div>
+		</div>
+	</body>
+</html>
