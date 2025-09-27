@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+
+		<script>
+			// 迷你 MVVM 核心思路：
+			// - 使用 Proxy 拦截 get/set，实现依赖收集(track) 与触发更新(trigger)
+			// - 用 effect(fn) 包裹渲染/绑定逻辑；fn 内读取状态即被收集为依赖
+			// - 当响应式数据变更时，找到对应副作用并重新执行，从而更新视图
+			// - 加入简易调度，将多次触发合并为一次微任务批量刷新，减少抖动
+			// 1) 依赖收集容器：target -> key -> Set<effect>
+			const targetMap = new WeakMap();
+			let activeEffect = null;
+
+			// effect(fn, options)
+			// - 运行传入的副作用函数并记录为当前活跃 effect
+			// - 在 fn 执行期间，对响应式数据的读取会触发 track，把该 effect 收集起来
+			// - 支持 scheduler：当触发更新时由调度器决定何时/如何执行该 effect
+			function effect(fn, options = {}) {
+				const runner = () => {
+					try {
+						activeEffect = runner;
+						return fn();
+					} finally {
+						activeEffect = null;
+					}
+				};
+				runner.scheduler = options.scheduler;
+				runner();
+				return runner;
+			}
+
+			// track(target, key)
+			// - 在 get 拦截中调用：把当前 activeEffect 记录到 target/key 的依赖集合
+			// - 结构：WeakMap(target) -> Map(key) -> Set(effects)
+			function track(target, key) {
+				if (!activeEffect) return;
+				let depsMap = targetMap.get(target);
+				if (!depsMap) targetMap.set(target, (depsMap = new Map()));
+				let dep = depsMap.get(key);
+				if (!dep) depsMap.set(key, (dep = new Set()));
+				dep.add(activeEffect);
+			}
+
+			// trigger(target, key)
+			// - 在 set 拦截中调用：根据 target/key 找到相关 effects 并触发
+			// - 若 effect 提供了 scheduler，则交给调度器；否则立即执行 effect
+			function trigger(target, key) {
+				const depsMap = targetMap.get(target);
+				if (!depsMap) return;
+				const effects = depsMap.get(key);
+				if (!effects) return;
+				effects.forEach((eff) => {
+					if (eff.scheduler) eff.scheduler(eff);
+					else eff();
+				});
+			}
+
+			// reactive(obj)
+			// - 返回 obj 的 Proxy 包装：
+			//   get：收集依赖（track）
+			//   set：变更数据并触发更新（trigger），仅在值确实变化时触发
+			function reactive(obj) {
+				return new Proxy(obj, {
+					get(target, key, receiver) {
+						const res = Reflect.get(target, key, receiver);
+						track(target, key);
+						return res;
+					},
+					set(target, key, value, receiver) {
+						const old = target[key];
+						const ok = Reflect.set(target, key, value, receiver);
+						if (ok && old !== value) trigger(target, key);
+						return ok;
+					},
+				});
+			}
+
+			// 2) 简易调度：批量刷新，避免频繁多次重绘
+			// - 使用微任务（Promise.then）把同一轮中的多次触发合并到一次执行
+			// - 通过 Set 去重，防止重复的 effect 在同一轮中执行多次
+			const jobQueue = new Set();
+			let flushing = false;
+			function queueJob(job) {
+				jobQueue.add(job);
+				if (flushing) return;
+				flushing = true;
+				Promise.resolve().then(() => {
+					jobQueue.forEach((j) => j());
+					jobQueue.clear();
+					flushing = false;
+				});
+			}
+
+			// 3) 编译模板：支持 {{}} 文本插值、data-model、data-on-click
+			// - 通过 DFS 遍历 DOM：
+			//   文本节点：把 `{{ key }}` 替换为 state[key]，并用 effect 订阅依赖
+			//   元素节点：
+			//     data-model：建立 state <-> view 的双向绑定
+			//     data-on-click：把点击事件绑定到 methods 中的同名函数
+			function compile(root, state, methods) {
+				const walk = (node) => {
+					// 文本节点：处理 {{ key }}
+					if (node.nodeType === 3) {
+						// 缓存原始模板文本，保持静态部分不变，只对插值占位进行替换
+						const original = node.textContent;
+						if (/\{\{([^}]+)\}\}/.test(original)) {
+							const render = () => {
+								// 在渲染期间访问 state[key]，从而完成依赖收集
+								// 这里的 replace 第二个参数是一个回调函数，用于处理每一个被正则匹配到的 {{ ... }} 插值表达式
+								// _ 表示完整匹配到的字符串（如 "{{ message }}"），expr 是括号内捕获到的内容（如 "message"）
+								// 逻辑是：去除表达式两端空格后，取 state 对应的属性值，替换到文本中
+								node.textContent = original.replace(
+									/\{\{([^}]+)\}\}/g,
+									(_, expr) => {
+										const key = expr.trim(); // 去除空格，得到变量名
+										return state[key]; // 返回响应式数据的当前值
+									}
+								);
+							};
+							// 用调度器合并多次变更，避免频繁 DOM 写入
+							effect(render, { scheduler: (job) => queueJob(job) });
+						}
+						return;
+					}
+
+					// 元素节点：处理 data-model 和 data-on-click
+					if (node.nodeType === 1) {
+						const el = node;
+						const modelKey = el.getAttribute && el.getAttribute("data-model");
+						if (modelKey) {
+							// state -> view：通过 effect 订阅 state[modelKey]，变化时把值写回控件
+							// 说明：读取 state[modelKey] 完成依赖收集；按控件类型分别赋值
+							effect(
+								() => {
+									if (el.type === "checkbox") {
+										el.checked = Boolean(state[modelKey]);
+									} else if (el.type === "radio") {
+										el.checked = el.value === state[modelKey];
+									} else {
+										el.value = state[modelKey] ?? "";
+									}
+								},
+								{ scheduler: (job) => queueJob(job) }
+							);
+
+							// view -> state：监听输入事件，把控件的值写回到 state
+							el.addEventListener("input", () => {
+								const v = el.type === "checkbox" ? el.checked : el.value;
+								state[modelKey] = v;
+							});
+						}
+
+						const onClick = el.getAttribute && el.getAttribute("data-on-click");
+						if (onClick && methods && typeof methods[onClick] === "function") {
+							// 事件绑定：把点击事件交给 methods 中的同名函数处理，this 指向 state
+							el.addEventListener("click", () => methods[onClick].call(state));
+						}
+
+						// 递归编译子节点，完成整棵 DOM 的绑定
+						Array.from(el.childNodes).forEach(walk);
+					}
+				};
+				walk(root);
+			}
+
+			// 4) 挂载：初始化状态与方法，并编译 #app
+			// - 这里等同于一个最小化的应用实例创建过程
+			function mount() {
+				const state = reactive({
+					title: "Proxy 实现的迷你 MVVM",
+					count: 0,
+					message: "你好，MVVM！",
+				});
+
+				// 与模板中的 data-on-click 同名的方法
+				const methods = {
+					increment() {
+						this.count++;
+					},
+					decrement() {
+						if (this.count > 0) this.count--;
+					},
+					clearMessage() {
+						this.message = "";
+					},
+				};
+
+				const app = document.querySelector("#app");
+				compile(app, state, methods);
+			}
+
+			// 等待 DOM 解析完成后再挂载，确保 #app 已在文档中
+			document.addEventListener("DOMContentLoaded", mount);
+		</script>
+	</head>
+	<body>
+		<div id="app">
+			<h2>{{ title }}</h2>
+			<div>
+				<button data-on-click="decrement">-1</button>
+				<span style="margin: 0 8px">计数：{{ count }}</span>
+				<button data-on-click="increment">+1</button>
+			</div>
+			<div style="margin-top: 12px">
+				<input type="text" data-model="message" placeholder="编辑消息" />
+				<button data-on-click="clearMessage">清空</button>
+				<p>消息：{{ message }}</p>
+			</div>
+		</div>
+	</body>
+</html>
