@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Custom Context Menu</title>
+		<style>
+			#custom-menu {
+				display: none;
+				position: absolute;
+				background-color: #f9f9f9;
+				border: 1px solid #d4d4d4;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+				list-style-type: none;
+				padding: 0;
+				margin: 0;
+				z-index: 1000;
+			}
+			#custom-menu li {
+				padding: 8px 16px;
+				cursor: pointer;
+			}
+			#custom-menu li:hover {
+				background-color: #f1f1f1;
+			}
+		</style>
+		<script>
+			window.onload = function () {
+				const el = document.getElementById("target");
+				console.log(el, "el");
+				el.addEventListener("contextmenu", function (event) {
+					event.preventDefault(); // 阻止默认的右键菜单
+
+					const menu = document.getElementById("custom-menu");
+					menu.style.left = event.pageX + "px";
+					menu.style.top = event.pageY + "px";
+					menu.style.display = "block";
+
+					// 隐藏自定义菜单
+					document.addEventListener("click", hideMenu);
+					// document.addEventListener("contextmenu", hideMenu);
+				});
+
+				function hideMenu() {
+					const menu = document.getElementById("custom-menu");
+					menu.style.display = "none";
+					document.removeEventListener("click", hideMenu);
+					document.removeEventListener("contextmenu", hideMenu);
+				}
+
+				// 处理自定义菜单的点击事件
+				document
+					.getElementById("option1")
+					.addEventListener("click", function () {
+						alert("Option 1 selected");
+						hideMenu();
+					});
+
+				document
+					.getElementById("option2")
+					.addEventListener("click", function () {
+						alert("Option 2 selected");
+						hideMenu();
+					});
+
+				document
+					.getElementById("option3")
+					.addEventListener("click", function () {
+						alert("Option 3 selected");
+						hideMenu();
+					});
+			};
+		</script>
+	</head>
+	<body>
+		<div
+			id="target"
+			style="width: 200px; height: 200px; background-color: #ccc"
+		>
+			Right-click me!
+		</div>
+
+		<ul id="custom-menu">
+			<li id="option1">Option 1</li>
+			<li id="option2">Option 2</li>
+			<li id="option3">Option 3</li>
+		</ul>
+	</body>
+</html>
