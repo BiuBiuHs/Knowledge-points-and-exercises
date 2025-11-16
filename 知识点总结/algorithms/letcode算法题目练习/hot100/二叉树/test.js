@@ -45,3 +45,50 @@ function rotate(arr, count) {
 
 var nums = [1, 2, 3, 4, 5, 6, 7];
 console.log(rotate(nums, 3));
+
+function productExceptSelf(nums) {
+	let n = nums.length;
+	let L = new Array(n);
+	let R = new Array(n);
+	let ans = new Arra(n);
+
+	L[0] = 1;
+
+	for (var i = 1; i < n; i++) {
+		L[i] = nums[i - 1] * L[i - 1];
+	}
+
+	R[n - 1] = 1;
+	for (var i = n - 2; i >= 0; i--) {
+		R[i] = nums[i + 1] * R[i + 1];
+	}
+	for (var i = 0; i < n; i++) {
+		ans[i] = L[i] * R[i];
+	}
+	return ans;
+}
+
+function reverseList(head) {
+	let dummyHead = new ListNode(null);
+
+	while (head) {
+		let next = head.next;
+		head.next = dummyHead.next;
+
+		dummyHead.next = head;
+
+		head = next;
+	}
+	return dummyHead.next;
+}
+
+function hasCycle(head) {
+	let countMap = new Map();
+
+	while (head) {
+		if (countMap.has(head)) return true;
+		countMap.set(head, head);
+		head = head.next;
+	}
+	return false;
+}
