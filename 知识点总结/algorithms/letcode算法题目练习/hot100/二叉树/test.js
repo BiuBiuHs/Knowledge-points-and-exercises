@@ -92,3 +92,27 @@ function hasCycle(head) {
 	}
 	return false;
 }
+
+function mergeTwoList(listA, listB) {
+	let dummyHead = new ListNode();
+	let cur = dummyHead;
+
+	while (listA && listB) {
+		if (listA.val < listB.val) {
+			cur.next = listA;
+			listA = listA.next;
+		} else {
+			cur.next = listB;
+			listB = listB.next;
+		}
+		cur = cur.next;
+	}
+	if (listA) {
+		cur.next = listA;
+	}
+	if (listB) {
+		cur.next = listB;
+	}
+
+	return dummyHead.next;
+}
