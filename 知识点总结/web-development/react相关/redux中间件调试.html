@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+
+		<script>
+			function add1(item) {
+				return item + 1;
+			}
+
+			function multiply2(item) {
+				return item * 2;
+			}
+
+			function plus3(item) {
+				return item + 3;
+			}
+
+			function compose(funcs) {
+				return funcs.reduce((a, b) => (...args) => {
+					console.log(b, "b fn");
+					console.log(args, "args");
+					return a(b(...args));
+				});
+			}
+			let composeedFn = compose([add1, multiply2, plus3]);
+			// debugger;
+			// // console.log(composeedFn, "composeedFn");
+			console.log(composeedFn(1));
+
+			// [1, 2, 3].reduce((sum, next) => {
+			// 	console.log(sum, "sum");
+			// 	console.log(next, "next");
+			// 	return (sum += next);
+			// });
+
+			// logger1 中间件：第一层函数接收 store
+			const logger1 = (next) => (action) => {
+				// store: 接收 store 对象，可以访问 getState 和 dispatch
+				// next: 接收下一个中间件或原始 dispatch 函数
+				// action: 接收要分发的 action 对象
+				console.log("logger1 开始", action); // 在调用 next 前执行，记录 action
+				const result = next(action); // 调用 next，将 action 传递给下一个中间件，并保存返回值
+				console.log("logger1 结束"); // 在 next 返回后执行，记录结束
+				return result; // 返回 next 的结果，保持链式调用的返回值传递
+			};
+
+			// logger2 中间件：结构与 logger1 相同
+			const logger2 = (next) => (action) => {
+				// store: 接收 store 对象
+				// next: 接收下一个中间件（logger3）或原始 dispatch
+				// action: 接收要分发的 action 对象
+				console.log("logger2 开始", action); // 在调用 next 前执行
+				const result = next(action); // 调用 next，传递给 logger3
+				console.log("logger2 结束"); // 在 next 返回后执行
+				return result; // 返回结果
+			};
+
+			// logger3 中间件：最后一个中间件
+			const logger3 = (next) => (action) => {
+				// store: 接收 store 对象
+				// next: 接收原始 dispatch 函数（因为它是最后一个中间件）
+				// action: 接收要分发的 action 对象
+				console.log("logger3 开始", action); // 在调用 next 前执行
+				const result = next(action); // 调用原始 dispatch，真正执行 reducer
+				console.log("logger3 结束"); // 在 dispatch 返回后执行
+				return result; // 返回 dispatch 的结果
+			};
+
+			let composedLog = compose([logger1, logger2, logger3])(() => {
+				console.log("outer test");
+			});
+			composedLog();
+		</script>
+	</head>
+	<body></body>
+</html>
