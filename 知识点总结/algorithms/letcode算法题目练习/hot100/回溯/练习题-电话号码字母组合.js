@@ -37,6 +37,7 @@ function letterCombinations(digits) {
 		// 1. 终止条件：索引达到字符串长度
 		if (index === digits.length) {
 			res.push(curStr);
+			return;
 		}
 
 		// 2. 选择循环：遍历当前数字对应的所有字母

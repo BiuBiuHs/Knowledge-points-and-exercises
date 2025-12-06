@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Web Worker 简单示例</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				max-width: 800px;
+				margin: 50px auto;
+				padding: 20px;
+				background: #f5f5f5;
+			}
+
+			.container {
+				background: white;
+				padding: 30px;
+				border-radius: 8px;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			}
+
+			h1 {
+				color: #333;
+				border-bottom: 3px solid #4caf50;
+				padding-bottom: 10px;
+			}
+
+			button {
+				background: #4caf50;
+				color: white;
+				border: none;
+				padding: 12px 24px;
+				border-radius: 4px;
+				cursor: pointer;
+				font-size: 16px;
+				margin: 10px 5px;
+			}
+
+			button:hover {
+				background: #45a049;
+			}
+
+			.result {
+				margin-top: 20px;
+				padding: 15px;
+				background: #f9f9f9;
+				border-left: 4px solid #4caf50;
+				border-radius: 4px;
+			}
+
+			.loading {
+				border-left-color: #2196f3;
+			}
+
+			.error {
+				border-left-color: #f44336;
+			}
+
+			pre {
+				background: #272822;
+				color: #f8f8f2;
+				padding: 15px;
+				border-radius: 4px;
+				overflow-x: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>🚀 Web Worker 简单示例</h1>
+
+			<div style="margin: 20px 0">
+				<h3>测试计算（观察页面是否卡顿）</h3>
+				<button onclick="testWithoutWorker()">不使用 Worker（会卡顿）</button>
+				<button onclick="testWithWorker()">使用 Worker（不卡顿）</button>
+				<button onclick="testAnimation()">测试动画</button>
+
+				<div
+					id="animation"
+					style="
+						width: 50px;
+						height: 50px;
+						background: #4caf50;
+						margin: 20px 0;
+						transition: transform 0.3s;
+					"
+				></div>
+				<div id="result"></div>
+			</div>
+
+			<div
+				style="
+					margin: 30px 0;
+					padding: 20px;
+					background: #fff3cd;
+					border-radius: 4px;
+				"
+			>
+				<h4>📝 使用说明：</h4>
+				<ol>
+					<li>此示例使用独立的 <code>worker.js</code> 文件</li>
+					<li>需要通过 HTTP 服务器运行（如 Live Server）</li>
+					<li>不能直接双击打开（会有 CORS 错误）</li>
+					<li>点击"测试动画"按钮，然后点击计算按钮，观察动画是否流畅</li>
+				</ol>
+			</div>
+
+			<div>
+				<h3>💻 代码示例：</h3>
+				<pre>
+// 主线程代码
+const worker = new Worker('worker.js');
+
+// 发送消息给 Worker
+worker.postMessage({
+    type: 'calculate',
+    data: { max: 1000000000 }
+});
+
+// 接收 Worker 的消息
+worker.onmessage = function(e) {
+    console.log('结果:', e.data.result);
+    worker.terminate(); // 终止 Worker
+};</pre
+				>
+
+				<pre>
+// worker.js 文件
+self.onmessage = function(e) {
+    const { type, data } = e.data;
+    
+    if (type === 'calculate') {
+        let sum = 0;
+        for (let i = 1; i <= data.max; i++) {
+            sum += i;
+        }
+        self.postMessage({ result: sum });
+    }
+};</pre
+				>
+			</div>
+		</div>
+
+		<script>
+			const resultDiv = document.getElementById("result");
+
+			// 不使用 Worker（会阻塞主线程）
+			function testWithoutWorker() {
+				resultDiv.className = "result loading";
+				resultDiv.innerHTML =
+					"<strong>⏳ 计算中...</strong><br>页面会卡顿，无法操作！";
+
+				setTimeout(() => {
+					const startTime = performance.now();
+
+					let sum = 0;
+					for (let i = 1; i <= 1000000000; i++) {
+						sum += i;
+					}
+
+					const endTime = performance.now();
+
+					resultDiv.className = "result error";
+					resultDiv.innerHTML = `
+                    <strong>❌ 主线程计算完成</strong><br>
+                    结果: ${sum}<br>
+                    耗时: ${(endTime - startTime).toFixed(2)}ms<br>
+                    <span style="color: red;">这期间页面完全卡死！</span>
+                `;
+				}, 100);
+			}
+
+			// 使用 Worker（不阻塞主线程）
+			function testWithWorker() {
+				resultDiv.className = "result loading";
+				resultDiv.innerHTML =
+					"<strong>⏳ Worker 计算中...</strong><br>页面保持流畅！";
+
+				// 检查 worker.js 是否存在
+				const worker = new Worker("worker.js");
+				const startTime = performance.now();
+
+				worker.postMessage({
+					type: "calculate",
+					data: { max: 1000000000 },
+				});
+
+				worker.onmessage = function (e) {
+					const endTime = performance.now();
+
+					resultDiv.className = "result";
+					resultDiv.innerHTML = `
+                    <strong>✅ Worker 计算完成</strong><br>
+                    结果: ${e.data.result}<br>
+                    耗时: ${(endTime - startTime).toFixed(2)}ms<br>
+                    <span style="color: green;">页面没有任何卡顿！</span>
+                `;
+
+					worker.terminate();
+				};
+
+				worker.onerror = function (error) {
+					resultDiv.className = "result error";
+					resultDiv.innerHTML = `
+                    <strong>❌ 错误</strong><br>
+                    ${error.message}<br>
+                    <br>
+                    <strong>可能的原因：</strong><br>
+                    1. 没有找到 worker.js 文件<br>
+                    2. 没有使用 HTTP 服务器运行（直接打开文件会有 CORS 错误）<br>
+                    <br>
+                    <strong>解决方案：</strong><br>
+                    使用 Live Server 或其他 HTTP 服务器运行此文件
+                `;
+				};
+			}
+
+			// 测试动画
+			function testAnimation() {
+				const animation = document.getElementById("animation");
+				if (animation.style.transform === "translateX(200px)") {
+					animation.style.transform = "translateX(0)";
+				} else {
+					animation.style.transform = "translateX(200px)";
+				}
+			}
+
+			// 页面加载提示
+			console.log("✅ 页面加载完成");
+			console.log("💡 点击按钮测试 Web Worker");
+		</script>
+	</body>
+</html>
