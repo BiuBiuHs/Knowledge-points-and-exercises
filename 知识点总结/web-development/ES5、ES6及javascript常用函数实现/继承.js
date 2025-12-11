@@ -130,7 +130,8 @@ console.log(s1);
 // 5.组合继承优化2
 
 function Person(name, age) {
-	(this.name = name), (this.age = age);
+	this.name = name;
+	this.age = age;
 }
 Person.prototype.setAge = function () {
 	console.log("111");
