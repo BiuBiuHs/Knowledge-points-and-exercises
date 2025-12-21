@@ -1,32 +1,53 @@
-function quickSort(arr, l=0, r=arr.length-1) {
-    if (l>r) return;
-    const pIndex=partition(arr,l,r);
-    quickSort(arr,l,pIndex-1);
-    quickSort(arr,pIndex+1,r);
-  }
-  
-  function partition(arr,l,r) {
-    /**
-     * 取出第一个元素x  ，所有的元素都与x元素比较 
-     * 所有大于 x元素的值放到右边
-     * 小于等于 x元素的值位置不变 
-     * 当不满足条件l<= r时 
-     * 此时将x元素与右指针的位置的元素互换
-     * 此时形成的数组 一定是 左侧小于等于x元素 的区间，x右侧都是大于等于x的数值区间 
-     */
-    
-    //注意此处
-    //一定要使用下标 index 方便后续的元素换位
-    const pivot=l++;
-    
-    while (l<=r) {
-      if (arr[l]<=arr[pivot])
-        l++;
-      else {
-        [arr[l], arr[r]]=[arr[r], arr[l]];
-        r--;
-      }
-    }
-    [arr[pivot], arr[r]]=[arr[r], arr[pivot]];
-    return r;
-  }
+// 快速排序的基本步骤
+// 选择基准（Pivot）：从数组中选择一个元素作为基准。选择基准的方法有很多，常见的有选择第一个元素、最后一个元素、中间元素或随机元素。
+// 分区（Partition）：重新排列数组，使得所有比基准小的元素都排在基准的左边，所有比基准大的元素都排在基准的右边。分区操作完成后，基准元素位于数组的最终位置。
+// 递归排序：递归地对基准左边的子数组和基准右边的子数组进行快速排序。
+// 详细步骤
+// 选择基准：
+
+// 选择数组中的一个元素作为基准。例如，选择数组的第一个元素。
+// 分区：
+
+// 初始化两个指针，一个从左到右扫描（i），一个从右到左扫描（j）。
+// 从左到右扫描，找到第一个大于基准的元素。
+// 从右到左扫描，找到第一个小于基准的元素。
+// 交换这两个元素的位置。
+// 重复上述步骤，直到两个指针相遇。
+// 将基准元素与相遇点的元素交换位置，完成分区。
+// 递归排序：
+
+// 对基准左边的子数组进行快速排序。
+// 对基准右边的子数组进行快速排序。
+
+function quickSort(arr, l = 0, r = arr.length - 1) {
+	if (l > r) return;
+	const pIndex = partition(arr, l, r);
+	quickSort(arr, l, pIndex - 1);
+	quickSort(arr, pIndex + 1, r);
+}
+
+function partition(arr, l, r) {
+	/**
+	 * 取出第一个元素x  ，所有的元素都与x元素比较
+	 * 所有大于 x元素的值放到右边
+	 * 小于等于 x元素的值位置不变
+	 * 当不满足条件l<= r时
+	 * 此时将x元素与右指针的位置的元素互换
+	 * 此时形成的数组 一定是 左侧小于等于x元素 的区间，x右侧都是大于等于x的数值区间
+	 */
+
+	//注意此处
+	//一定要使用下标 index 方便后续的元素换位
+	// 此处是选取第一个元素 当作基准 ，赋值给pivot 后l 变为L+1
+	const pivot = l++;
+
+	while (l <= r) {
+		if (arr[l] <= arr[pivot]) l++;
+		else {
+			[arr[l], arr[r]] = [arr[r], arr[l]];
+			r--;
+		}
+	}
+	[arr[pivot], arr[r]] = [arr[r], arr[pivot]];
+	return r;
+}
