@@ -39,7 +39,8 @@ function partition(arr, l, r) {
 	//注意此处
 	//一定要使用下标 index 方便后续的元素换位
 	// 此处是选取第一个元素 当作基准 ，赋值给pivot 后l 变为L+1
-	const pivot = l++;
+	const pivot = l;
+	l++;
 
 	while (l <= r) {
 		if (arr[l] <= arr[pivot]) l++;
