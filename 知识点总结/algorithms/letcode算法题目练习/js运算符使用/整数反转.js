@@ -5,7 +5,6 @@
 // 如果反转后整数超过 32 位的有符号整数的范围 [−231,  231 − 1] ，就返回 0。
 
 // 假设环境不允许存储 64 位整数（有符号或无符号）。
- 
 
 // 示例 1：
 
@@ -23,7 +22,6 @@
 
 // 输入：x = 0
 // 输出：0
- 
 
 // 提示：
 
@@ -42,17 +40,30 @@
 // 1	32
 // 0	321
 
+//运算符求解
 
 /**
  * @param {number} x
  * @return {number}
  */
-var reverse = function(x) {
-    let result = 0;
-    while(x !== 0) {
-        result = result * 10 + x % 10;
-        x = (x / 10) | 0;
-    }
-    return (result | 0) === result ? result : 0;
+// var reverse = function (x) {
+// 	let result = 0;
+// 	while (x !== 0) {
+// 		result = result * 10 + (x % 10);
+// 		x = (x / 10) | 0;
+// 	}
+// 	return (result | 0) === result ? result : 0;
+// };
+
+// 使用函数求解
+
+var reverse = function (x) {
+	let result = 0;
+	while (x !== 0) {
+		result = result * 10 + (x % 10);
+		x = Math.floor(x / 10);
+	}
+	return result;
 };
 
+// console.log(reverse(1234));
