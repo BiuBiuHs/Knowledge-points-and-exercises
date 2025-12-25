@@ -24,39 +24,38 @@
  * @param {ListNode} head
  * @return {ListNode}
  */
- var reverseList = function(head) {
-    let curr = head
-    let prev = null 
-    while(curr){
-        const next = curr.next;
-        curr.next = prev;
-        prev = curr;
-        curr = next;
-    }
-    return prev
+var reverseList = function (head) {
+	let curr = head;
+	let prev = null;
+	while (curr) {
+		const next = curr.next;
+		curr.next = prev;
+		prev = curr;
+		curr = next;
+	}
+	return prev;
 };
-//使用假头进行反转 
+
+//使用假头进行反转
 var rerverse = function (head) {
-    const dummy = new ListNode()
-    while(head) {
-        const back = head.next;
-        head.next  = dummy.next 
-        dummy.next = head
-        head = back
-    }
-    return dummy.next
-}
+	const dummy = new ListNode();
+	while (head) {
+		const back = head.next;
+		head.next = dummy.next;
+		dummy.next = head;
+		head = back;
+	}
+	return dummy.next;
+};
 
 //递归
 
-var reverseList = function(head) {
-    if (head == null || head.next == null) {
-        return head;
-    }
-    const newHead = reverseList(head.next);
-    head.next.next = head;
-    head.next = null;
-    return newHead;
+var reverseList = function (head) {
+	if (head == null || head.next == null) {
+		return head;
+	}
+	const newHead = reverseList(head.next);
+	head.next.next = head;
+	head.next = null;
+	return newHead;
 };
-
-

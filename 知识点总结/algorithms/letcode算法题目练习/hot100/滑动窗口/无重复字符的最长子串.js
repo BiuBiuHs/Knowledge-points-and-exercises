@@ -46,22 +46,53 @@
  */
 var lengthOfLongestSubstring = function (s) {
 	//使用map记录 每个字符最后出现的位置
-	const strMap = new Map()
+	const strMap = new Map();
 	//把left指向 相当于我们在字符串的左边界的左侧，还没有开始移动
-	let left = -1
-	let ans = 0
+	let left = 0;
+	let ans = 0;
 	//遍历字符串
 	for (var i = 0; i < s.length; i++) {
+		let curStr = s[i];
+		strMap.set(s[i], (strMap.get(s[i]) || 0) + 1);
 		//当重复的字符在上一次的边界右侧后 更新左侧边界
-		while (strMap.get(s[i]) > left) {
-			left = strMap.get(s[i])
+		while (strMap.get(s[i]) > 1) {
+			let outStr = s[left];
+			strMap.set(outStr, strMap.get(outStr) - 1);
+			left++;
 		}
-		//更新字符的下标
-		strMap.set(s[i], i)
 		//贪心取到最大值
 		//区间为 i 到left 的差值
 		//区间为左开右闭区间
-		ans = Math.max(ans, i - left)
+		ans = Math.max(ans, i - left + 1);
 	}
-	return ans
-}
+	return ans;
+};
+
+console.log(lengthOfLongestSubstring("abcabcbb"), "长度为");
+
+//获取无重复字符串的长度
+var LongestSubstring = function (s) {
+	//使用map记录 每个字符最后出现的位置
+	const strMap = new Map();
+	//把left指向 相当于我们在字符串的左边界的左侧，还没有开始移动
+	let left = 0;
+	let ans = "";
+	//遍历字符串
+	for (var i = 0; i < s.length; i++) {
+		let curStr = s[i];
+		strMap.set(s[i], (strMap.get(s[i]) || 0) + 1);
+		//当重复的字符在上一次的边界右侧后 更新左侧边界
+		while (strMap.get(s[i]) > 1) {
+			let outStr = s[left];
+			strMap.set(outStr, strMap.get(outStr) - 1);
+			left++;
+		}
+		let tempStr = s.slice(left, i + 1);
+
+		ans = tempStr.length > ans.length ? tempStr : ans;
+	}
+
+	return ans;
+};
+
+console.log(LongestSubstring("abcabcbb"), "字符串为");
